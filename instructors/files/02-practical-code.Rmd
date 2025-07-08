@@ -1,0 +1,141 @@
+---
+title: "02-practical-code"
+author: "Kaitlyn Johnson"
+date: "2025-07-08"
+output: html_document
+---
+# Load packages
+```{r}
+library(epiparameter)
+library(EpiNow2)
+library(tidyverse)
+```
+# Read reported cases for ebola -----------------------------------------------
+```{r}
+dat <- read_rds(
+  "https://epiverse-trace.github.io/tutorials-middle/data/ebola_35days.rds"
+) %>%
+  dplyr::select(date, confirm = cases)
+```
+
+# Define a generation time from {epiparameter} to {EpiNow2} ---------------
+Here we are using the serial interval as an approximation to the GI (remember 
+serial interval is time between symptom onset of infector to symptom onset of 
+infectee, generation interval is time between incident infection of 
+infector to infectee.) The GI is always positive, whereas the serial interval
+can be negative. 
+```{r}
+# access a serial interval
+dat_serialint <- epiparameter::epiparameter_db(
+  disease = "ebola",
+  epi_name = "serial",
+  single_epiparameter = TRUE
+)
+```
+This is an object(list) containing disease, pathogen, epi parameters, study
+citation, distribution and parameters of that distribution. 
+
+# Extract the parameters from the epiparameter object
+```{r}
+# extract parameters from {epiparameter} object
+dat_serialint_params <- epiparameter::get_parameters(dat_serialint)
+```
+This is a named vector.
+
+Pass the parameters from epiparameter into the distribution interface in 
+`EpiNow2`. Can either use the shape and scale parameters or the mean and
+sd. Alternatively, if you knew only the mean and sd or shape and scale you could
+just pass them in directly
+```{r}
+# adapt {epiparameter} to {EpiNow2} distribution inferfase
+dat_generationtime <- EpiNow2::Gamma(
+  shape = dat_serialint_params["shape"],
+  scale = dat_serialint_params["scale"]
+)
+# or
+dat_generationtime <- EpiNow2::Gamma(
+  mean = dat_serialint$summary_stats$mean,
+  sd = dat_serialint$summary_stats$sd
+)
+```
+# Define the delays from infection to case report for {EpiNow2} -----------
+This will be the delay from infection to sympton onset (also know as the
+incubation period) and the time from symptom onset to case report. EpiNow2 
+handles combining these two delay distributions under the hood (with a 
+convolution). 
+
+# Start by defining manually a delay from symptom onset to case report using 
+the specified parameters.
+```{r}
+# define delay from symptom onset to case report
+dat_reportdelay <- EpiNow2::LogNormal(
+  meanlog = EpiNow2::Normal(mean = 1.4, sd = 0.5),
+  sdlog = EpiNow2::Normal(mean = 0.25, sd = 0.2),
+  max = 5
+)
+```
+
+Use epiparameter to get the incubation time. 
+```{r}
+# define a delay from infection to symptom onset
+dat_incubationtime <- epiparameter::epiparameter_db(
+  disease = "ebola",
+  epi_name = "incubation",
+  single_epiparameter = TRUE
+)
+
+# incubation period: extract distribution parameters
+dat_incubationtime_params <- epiparameter::get_parameters(
+  dat_incubationtime
+)
+```
+
+Get the maximum value of the incubation period because we are going to need to 
+set a maximum in EpiNow2
+```{r}
+# incubation period: discretize and extract maximum value (p = 99%)
+dat_incubationtime_max <- dat_incubationtime %>% 
+  epiparameter::discretise() %>%
+  quantile(p = 0.99)
+# or
+dat_incubationtime_max <- dat_incubationtime %>%
+  quantile(p = 0.99) %>%
+  base::round()
+
+# incubation period: adapt to {EpiNow2} distribution interface
+dat_incubationtime_epinow <- EpiNow2::Gamma(
+  shape = dat_incubationtime_params["shape"],
+  scale = dat_incubationtime_params["scale"],
+  max = dat_incubationtime_max
+)
+```
+
+# print required input
+```{r}
+dat_generationtime
+dat_reportdelay
+dat_incubationtime_epinow
+```
+
+# Set the number of parallel cores for {EpiNow2} --------------------------
+```{r}
+withr::local_options(list(mc.cores = parallel::detectCores() - 1))
+```
+
+# Estimate transmission using EpiNow2::epinow() ---------------------------
+# with EpiNow2::*_opts() functions for generation time, delays, and stan.
+```{r}
+estimates <- EpiNow2::epinow(
+  data = dat,
+  generation_time = EpiNow2::generation_time_opts(dat_generationtime),
+  delays = EpiNow2::delay_opts(dat_incubationtime_epinow + dat_reportdelay),
+  stan = EpiNow2::stan_opts(samples = 1000, chains = 3)
+)
+```
+
+# Print plot and summary table outputs ------------------------------------
+```{r}
+summary(estimates)
+plot(estimates)
+
+```
