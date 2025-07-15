@@ -320,7 +320,7 @@ Get delay distributions from epi parameter (same as before)
 ```{r}
 disease_delay <- epiparameter::epiparameter_db(
   disease = "covid",
-  epi_name = "onset-to-death",
+  epi_name = "onset_to_death",
   single_epiparameter = TRUE
 )
 
