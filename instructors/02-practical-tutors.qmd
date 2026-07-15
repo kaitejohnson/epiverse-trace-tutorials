@@ -33,62 +33,74 @@ knitr::opts_chunk$set(
 
 This practical is based in the following tutorial episodes:
 
-- <https://epiverse-trace.github.io/tutorials-middle/delays-access.html>
 - <https://epiverse-trace.github.io/tutorials-middle/quantify-transmissibility.html>
-- <https://epiverse-trace.github.io/tutorials-middle/delays-functions.html>
 - <https://epiverse-trace.github.io/tutorials-middle/severity-static.html>
 
 :::
 
+::: {.content-visible when-format="docx"}
+
 {{< include _welcome.qmd >}}
+
+:::
 
 # Practical
 
 This practical has two activities.
 
-## Activity 1: Transmission
+## Activity 1: Quantify Transmission
 
-Estimate $R_{t}$, _new infections_, _new reports_, _growth rate_, and _doubling/halving time_ using the following available inputs:
+**Goal:**
 
-- Incidence of reported cases per day
+Assess real-time transmission on the most recent date available. Use one or more of the following transmission estimates:
+
+- $R_t$​ (reproduction number)
+- New infections
+- New reports
+- Growth rate
+- Doubling or halving time
+
+Base this assessment on the inputs below:
+
+- Daily incidence of reported cases
 - Reporting delay
+- Historical delay distributions from prior outbreaks
 
-As a group, Write your answers to these questions:
+**Steps:**
 
-- What phase of the epidemic are you observing? (Exponential growth phase, near peak, or decay end phase)
-- Is the expected change in daily reports consistent with the estimated effective reproductive number, growth rate, and doubling time?
-- Interpret: How would you communicate these results to a decision-maker?
-- Compare: What differences do you identify from other group outputs? (if available)
+1. Open `02-practical-activity-1.R` and complete every line marked with `#<COMPLETE>`, following the instructions in the file.
+2. In the `read_rds()` step, keep only the reading function that corresponds to your group's disease (see table below).
+3. Aim to define 3 delays before running `EpiNow2::epinow()`
+4. Paste screenshots of the summary table and plot outputs, then answer the questions below.
+
+**Questions:**
+
+- Identify the epidemic phase: Are you observing exponential growth, near peak, or decay?
+- Reflect: When is the serial interval a good approximation of the generation time, and when is it not?
+- Check consistency: Is the `Expected change in daily reports` consistent with the estimated effective reproduction number, growth rate, and doubling time?
+- Interpret the results: How would you communicate these findings to a decision-maker?
+<!-- - Compare outputs: What differences do you notice compared to other groups' results (if available)? -->
+
+Discuss your answers within your group before sharing with the wider room.
 
 ### Inputs
 
-| Group | Incidence | Link |
+| Room | Incidence | Link |
 |---|---|---|
-| 1 | COVID 30 days | <https://epiverse-trace.github.io/tutorials-middle/data/covid_30days.rds> |
+| 1 | COVID-19 30 days | <https://epiverse-trace.github.io/tutorials-middle/data/covid_30days.rds> |
 | 2 | Ebola 35 days | <https://epiverse-trace.github.io/tutorials-middle/data/ebola_35days.rds> |
 | 3 | Ebola 60 days | <https://epiverse-trace.github.io/tutorials-middle/data/ebola_60days.rds> |
-| 4 | COVID 60 days | <https://epiverse-trace.github.io/tutorials-middle/data/covid_60days.rds> |
+| 4 | COVID-19 60 days | <https://epiverse-trace.github.io/tutorials-middle/data/covid_60days.rds> |
 
-
-| Disease | Reporting delays |
-|---|---|
-| Ebola | The time difference between symptom onset and case report follows a Lognormal distribution with uncertainty. The **meanlog** follows a Normal distribution with mean = 1.4 days and sd = 0.5 days. The **sdlog** follows a Normal distribution with mean = 0.25 days and sd = 0.2 days. Bound the distribution with a maximum = 5 days. |
-| COVID | The time difference between symptom onset and case report follows a Gamma distribution with uncertainty. The **mean** follows a Normal distribution with mean = 2 days and sd = 0.5 days. The **standard deviation** follows a Normal distribution with mean = 1 day and sd = 0.5 days. Bound the distribution with a maximum = 5 days. |
-
-: {tbl-colwidths="[15,85]"}
 
 ::: {.content-visible when-format="docx"}
-
-### Your Code
-
-Use the file `02-practical-activity-1.Rmd`.
 
 
 ### Your Answers
 
-Group 1
+Room 1
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -108,9 +120,9 @@ Write your answers to the questions above:
 
 ------------------------
 
-Group 2
+Room 2
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -130,9 +142,9 @@ Write your answers to the questions above:
 
 ------------------------
 
-Group 3
+Room 3
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -152,9 +164,9 @@ Write your answers to the questions above:
 
 ------------------------
 
-Group 4
+Room 4
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -180,22 +192,48 @@ Write your answers to the questions above:
 
 #### Code
 
-##### Ebola (sample)
+##### Ebola (Group 2 and 3)
 
-```{r, file = "fig/02-practical-instructor-1-G2.R", eval = FALSE}
+Two solution scripts are available:
+
+- **Quick solution** — parameters are copied and pasted directly, suitable for the time available during the practical.
+- **Preferred solution** — parameters are drawn from existing objects, the recommended approach for reproducible workflows.
+
+###### Quick
+
+```{r, file = "fig/02-practical-instructor-1b-G2.R", eval = FALSE}
+
+```
+
+###### Preferred
+
+```{r, file = "fig/02-practical-instructor-1a-G2.R", eval = FALSE}
 
 ```
 
 
-##### COVID (sample)
+##### COVID (Group 1 and 4)
 
-```{r, file = "fig/02-practical-instructor-1-G1.R", eval = FALSE}
+Two solution scripts are available:
+
+- **Quick solution** — parameters are copied and pasted directly, suitable for the time available during the practical.
+- **Preferred solution** — parameters are drawn from existing objects, the recommended approach for reproducible workflows.
+
+###### Quick
+
+```{r, file = "fig/02-practical-instructor-1b-G1.R", eval = FALSE}
+
+```
+
+###### Preferred
+
+```{r, file = "fig/02-practical-instructor-1a-G1.R", eval = FALSE}
 
 ```
 
 #### Outputs
 
-##### Group 1: COVID 30 days
+##### Room 1: COVID 30 days
 
 With reporting delay plus Incubation time:
 ![image](https://hackmd.io/_uploads/BJl8wYiDC.png){width=25%}
@@ -212,7 +250,7 @@ With reporting delay plus Incubation time:
 5:     Doubling/halving time (days)         7 (2.7 -- -14)
 ```
 
-##### Group 2: Ebola 35 days
+##### Room 2: Ebola 35 days
 
 With reporting delay plus Incubation time:
 ![image](https://hackmd.io/_uploads/H1ZrYYsvR.png){width=25%}
@@ -229,7 +267,7 @@ With reporting delay plus Incubation time:
 5:     Doubling/halving time (days)      -18 (5.5 -- -3.9)
 ```
 
-##### Group 3: Ebola 60 days
+##### Room 3: Ebola 60 days
 
 With reporting delay plus Incubation time:
 ![image](https://hackmd.io/_uploads/Byu3FFoDR.png){width=25%}
@@ -246,7 +284,7 @@ With reporting delay plus Incubation time:
 5:     Doubling/halving time (days)      -4.4 (-1300 -- -2.2)
 ```
 
-##### Group 4: COVID 60 days
+##### Room 4: COVID 60 days
 
 With reporting delay plus Incubation time:
 ![image](https://hackmd.io/_uploads/S1q6ItjvC.png){width=25%}
@@ -272,7 +310,7 @@ Interpretation template:
 `1987` with 90% credible interval of `760` to `4566`.
 
 + The effective reproduction number $R_t$ estimate (on the last date of the data),
-or the number of new infections caused by one infectious individual, on average, is
+or the number of new infections caused by one infected individual, on average, is
 `0.81`, with a 90% credible interval of `0.43` to `1.30`.
 
 + The exponential growth rate of case reports is, on average
@@ -295,63 +333,95 @@ there is no statistical evidence of extinction if the 90% credible intervals of:
     - Rt include the value 1,
     - growth rate include the value 0,
     - doubling or halving time include the value 0.
-- From table:
-    - The values from the `summary()` output correspond to the latest available date under analysis.
-    - The `Expected change in reports` categories (e.g., `Stable` or `Likely decreasing`)
+
+About generation time and serial interval:
+
+- The serial interval approximates the generation time when infectiousness begins after symptom onset. 
+- When infectiousness starts before symptom onset, serial intervals can take negative values, making this approximation unreliable. 
+- Read further in the [tutorial episode on accessing delays](https://epiverse-trace.github.io/tutorials-middle/delays-access.html#generation-time-vs-serial-interval)
+
+**From table**:
+
+  - The values from the `summary()` output correspond to the latest available date under analysis.
+  - The `Expected change in reports` categories (e.g., `Stable` or `Likely decreasing`)
     describe the expected change in daily cases based on the posterior probability that Rt < 1.
-    Find the tutorial table at:
-    <https://epiverse-trace.github.io/tutorials-middle/quantify-transmissibility.html#expected-change-in-reports>
-- From figure:
-    - The estimate of Reports fits the input incidence curve.
-    - The forecast of New infections and Reports per day assumes no change in the reproduction number. For that reason,
+    Find the [tutorial table about `expected change in reports`](https://epiverse-trace.github.io/tutorials-middle/quantify-transmissibility.html#expected-change-in-reports)
+
+**From figure**:
+
+  - The estimate of `Reports` fits the input incidence curve.
+  - The forecast of `New infections` and `Reports` per day assumes no change in the reproduction number. For that reason,
     the forecast section of "Effective reproduction no." is constant.
-    - When we include at `delays` both the incubation and reporting delay, 
-        - In Reports, the forecast credible intervals increases.
-        - New infections per day, uncertainty increases in an equivalent size to the delays
-- From comparing COVID and Ebola outputs:
-    - The finite maximum value of the generation time distribution define the range of the “estimate based on parial data”.
+  - The estimated trajectory of `New Infections` (line) is delayed from the `New Reports` (bars), due to the added incubation and reporting delays.
+  - About delays:
+      - When we correctly include **incubation** and **reporting** `delays` in `EpiNow2::epinow()`, 
+          - In `Reports`, the forecast credible intervals increases.
+          - In `New infections` per day, uncertainty is expanded due to the length of delays.
+      - If we forget adding delays, `{EpiNow2}` could misinterpret `Reports` (confirmed cases) as `Infections`.
+          - For example, using one same input data of reference (e.g., COVID 30 days).
+          - If we forget adding delays, **Panel B** overlaps the trajectory of New infections and the frequency of Reports. 
+          - If we correctly add delays, In Reports, the upper interval increases from 30k to 45k. In New infections per day, uncertainty expands from Mar 16 onwards.
+  - From comparing COVID and Ebola outputs:
+      - The finite maximum value of the **generation** time distribution define the range of the `Estimate based on parial data`.
+      - Both values are defined by default by {EpiNow2} using a percentile of 99%
+          - COVID: `max` = ~14 days,
+          - Ebola: `max` = ~45 days.
+      - For this reason, Ebola 35 days has no `Estimate` but only `Estimate based on partial data` and `Forecast`.
+
 
 :::
 
 
-## Activity 2: Severity
+## Activity 2: Estimate Severity
 
-Estimate the _naive CFR (nCFR)_ and _delay-adjusted CFR (aCFR)_ using the following inputs:
+**Goal:**
+
+Estimate two case fatality ratio measures:
+
+- Naive CFR (nCFR)
+- Delay-adjusted CFR (aCFR)
+
+Use the inputs below:
 
 - Reported cases (aggregate incidence by date of onset)
-- Onset to death delay
+- Onset-to-death delay
 
-As a group, Write your answers to these questions:
+**Steps**
 
-- What phase of the epidemic are you observing? (Exponential growth phase, near peak, or decay end phase)
-- Does the time series include all the possible deaths to observe from known cases?
-- How much difference is there between the nCFR and aCFR estimates?
-- Interpret: How would you communicate these results to a decision-maker?
-- Compare: What differences do you identify from other group outputs? (if available)
+1. Open `02-practical-activity-2.R` and complete every line marked `#<COMPLETE>`, following the instructions in the file.
+2. Plot the incidence curves for cases and deaths.
+3. Estimate the naive and delay-adjusted CFR.
+4. Paste screenshots of the table outputs, then answer the questions below.
 
+
+**Questions:**
+
+- Identify the epidemic phase: Are you observing exponential growth, near peak, or decay?
+- Reflect: Does the time series include all possible deaths from known cases?
+- Compare: How much difference is there between the nCFR and aCFR estimates?
+- Interpret the results: How would you communicate these findings to a decision-maker?
+<!-- - Compare outputs: What differences do you notice compared to other groups' results (if available)? -->
+
+Discuss your answers within your group before sharing with the wider room.
 
 ### Inputs
 
-| Group | Data | Action to data input | Link |
+| Room | Data | Feature input | Link |
 |---|---|---|---|
-| 1 | COVID-19 Diamond Princess | Keep dates before March 1st | <https://epiverse-trace.github.io/tutorials-middle/data/diamond_70days.rds> |
-| 2 | COVID-19 Diamond Princess | Estimate from complete time series | <https://epiverse-trace.github.io/tutorials-middle/data/diamond_70days.rds> |
-| 3 | MERS Korea 2015 | Adapt from incidence to {cfr} | <https://epiverse-trace.github.io/tutorials-middle/data/mers_linelist.rds> |
+| 1 | COVID-19 Diamond Princess | Time serie before March 1st | <https://epiverse-trace.github.io/tutorials-middle/data/diamond_25days.rds> |
+| 2 | COVID-19 Diamond Princess | Complete time series of deaths among cases | <https://epiverse-trace.github.io/tutorials-middle/data/diamond_70days.rds> |
+| 3 | MERS Korea 2015 | Requires adaptation of `<incidence2>` to {cfr} | <https://epiverse-trace.github.io/tutorials-middle/data/mers_linelist.rds> |
 
 
 
 ::: {.content-visible when-format="docx"}
 
-### Your Code
-
-Use the file `02-practical-activity-2.R`.
-
 
 ### Your Answers
 
-Group 1
+Room 1
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -371,9 +441,9 @@ Write your answers to the questions above:
 
 ------------------------
 
-Group 2
+Room 2
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -393,9 +463,9 @@ Write your answers to the questions above:
 
 ------------------------
 
-Group 3
+Room 3
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -415,9 +485,9 @@ Write your answers to the questions above:
 
 ------------------------
 
-Group 4
+Room 4
 
-| output | paste here |
+| Output | Paste screenshot below |
 |---|---|
 | figure |  |
 | table |  |
@@ -444,15 +514,26 @@ Write your answers to the questions above:
 
 #### Code
 
-##### COVID (sample)
+##### Room 1: COVID 25 days
+
+25 days (before March 1st)
 
 ```{r, file = "fig/02-practical-instructor-2-G1.R", eval = FALSE}
 
 ```
 
-##### MERS (sample)
+##### Room 2: COVID 70 days
+
+70 days (until April 15th)
 
 ```{r, file = "fig/02-practical-instructor-2-G2.R", eval = FALSE}
+
+```
+
+
+##### Room 3: MERS
+
+```{r, file = "fig/02-practical-instructor-2-G3.R", eval = FALSE}
 
 ```
 
@@ -481,9 +562,13 @@ Interpretation template:
 
 Intepretation helpers:
 
+- We can assess if the time series include all the possible deaths to observe from known cases using:
+    - the delay distribution from onset to death. Using the percentile-99, for COVID we may need to wait ~60 days and for MERS, ~49 days.
+    - calculating the time difference between the observed date of onset and date of death from the input linelist data, stratified by age category.
+- For COVID-19, until the end of February (on March 1st), the delay-adjusted (aCFR) central estimate is higher than the naive CFR (nCFR), but closer to the nCFR estimates on April 15th.
+- With all data available, the delay-adusted and naive are similar (exactly the same). This is not the case for the data available up until March 1.
 - The MERS incidence curve seems to be in a decay phase. However, it is expected to have death reports in upcoming dates, as observed in the COVID Diamond Princess data.
-- For COVID, until the end of February (on March 1st), the aCFR central estimate is closer to the CFR estimates on April 15th.
-- For MERS, the aCFR estimate is almost the double of the nCFR estimate.
+- For MERS, the aCFR central estimate is almost the double of the nCFR estimate, but 95% confidence intervals quite overlapped. 
 
 Complementary notes:
 

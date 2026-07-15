@@ -3,6 +3,8 @@
 # Practical 2
 # Activity 2
 
+room_number <- 1
+
 # Load packages -----------------------------------------------------------
 library(cfr)
 library(epiparameter)
@@ -11,7 +13,7 @@ library(tidyverse)
 
 # Read reported cases -----------------------------------------------------
 disease_dat <- readr::read_rds(
-  "https://epiverse-trace.github.io/tutorials-middle/data/diamond_70days.rds"
+  "https://epiverse-trace.github.io/tutorials-middle/data/diamond_25days.rds"
 )
 
 disease_dat
@@ -50,25 +52,6 @@ disease_delay <- epiparameter::epiparameter_db(
 
 
 # Estimate naive and adjusted CFR ----------------------------------------
-
-# Estimate static CFR
-disease_adapted %>%
-  filter(
-    date < ymd(20200301)
-  ) %>%
-  cfr::cfr_static()
-
-# Estimate static delay-adjusted CFR
-disease_adapted %>%
-  filter(
-    date < ymd(20200301)
-  ) %>%
-  cfr::cfr_static(
-    delay_density = function(x) density(disease_delay, x)
-  )
-
-
-# Estimate in complete time series ---------------------------------------
 
 # Estimate static CFR
 disease_adapted %>%

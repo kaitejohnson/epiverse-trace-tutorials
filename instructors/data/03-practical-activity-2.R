@@ -3,6 +3,9 @@
 # Practical 3
 # Activity 2
 
+# step: fill in your room number
+room_number <- #<COMPLETE> replace with 1/2/3/4
+
 # Load packages -----------------------------------------------------------
 library(epiparameter)
 library(epichains)
@@ -10,31 +13,39 @@ library(tidyverse)
 
 
 # Set input parameters ---------------------------------------------------
+# step: Paste the corresponding input parameter for this room.
+
 known_basic_reproduction_number <- #<COMPLETE>
 known_dispersion <- #<COMPLETE>
 chain_to_observe <- #<COMPLETE>
 
 
 # Set iteration parameters -----------------------------------------------
+# step: Learn to create an <epiparameter> class object from scratch.
 
 # Create generation time as an <epiparameter> object
 generation_time <- epiparameter::epiparameter(
   disease = "disease x",
   epi_name = "generation time",
-  prob_distribution = "gamma",
-  summary_stats = list(mean = 3, sd = 1)
+  prob_distribution =
+    epiparameter::create_prob_distribution(
+      prob_distribution = "gamma",
+      prob_distribution_params = c(shape = 9.000, scale = 0.333)
+    )
 )
 
 
 # Simulate multiple chains -----------------------------------------------
-# Run set.seed() and epichains::simulate_chains() together, in the same run
+# step: Simulate 1000 chains from 1 initial case. Add the offspring
+# and generation time parameters, and run set.seed() together with
+# simulate_chains().
 
 # Set seed for random number generator
 set.seed(33)
 
 multiple_chains <- epichains::simulate_chains(
   # Simulation controls
-  n_chains = #<COMPLETE>, # Number of chains to simulate
+  n_chains = 1000, # Number of chains to simulate
   statistic = "size",
   stat_threshold = 500, # Stopping criteria
   # Offspring
@@ -42,13 +53,17 @@ multiple_chains <- epichains::simulate_chains(
   mu = #<COMPLETE>,
   size = #<COMPLETE>,
   # Generation
-  generation_time = #<COMPLETE>
+  generation_time = function(x) generate(x = #<COMPLETE>, times = x)
 )
 
 multiple_chains
 
 
 # Explore suggested chain ------------------------------------------------
+# step: Inspect the selected chain, paste a screenshot, and describe
+# in the report: number of infectors and their IDs, number of
+# generations, and who infected whom (and when) per generation.
+
 multiple_chains %>%
   # Use data.frame output from <epichains> object
   as_tibble() %>%
@@ -57,6 +72,13 @@ multiple_chains %>%
 
 
 # Visualize --------------------------------------------------------------
+# step: Plot the simulation and build a summary data frame; paste
+# the plot output in the report. Use it to describe:
+# - proportion of chains that go extinct quickly (probability of
+#   extinction)
+# - proportion that crossed the 100-case threshold (explosive
+#   growth from one index case)
+# Write in the report: interpretation and comparison between rooms.
 
 # Daily aggregate of cases
 aggregate_chains <- multiple_chains %>%

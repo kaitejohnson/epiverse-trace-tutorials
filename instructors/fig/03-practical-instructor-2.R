@@ -3,6 +3,9 @@
 # Practical 3
 # Activity 2
 
+# step: fill in your room number
+room_number <- 1 #valid for all
+
 # Load packages -----------------------------------------------------------
 library(epiparameter)
 library(epichains)
@@ -10,12 +13,15 @@ library(tidyverse)
 
 
 # Set input parameters ---------------------------------------------------
-known_basic_reproduction_number <- 0.8
-known_dispersion <- 0.01
-chain_to_observe <- 957
+# step: Paste the corresponding input parameter for this room.
+
+known_basic_reproduction_number <- 0.8 #<DIFFERENT PER GROUP>
+known_dispersion <- 0.01 #<DIFFERENT PER GROUP>
+chain_to_observe <- 957 #<DIFFERENT PER GROUP>
 
 
 # Set iteration parameters -----------------------------------------------
+# step: Learn to create an <epiparameter> class object from scratch.
 
 # Create generation time as an <epiparameter> object
 generation_time <- epiparameter::epiparameter(
@@ -27,7 +33,9 @@ generation_time <- epiparameter::epiparameter(
 
 
 # Simulate multiple chains -----------------------------------------------
-# Run set.seed() and epichains::simulate_chains() together, in the same run
+# step: Simulate 1000 chains from 1 initial case. Add the offspring
+# and generation time parameters, and run set.seed() together with
+# simulate_chains().
 
 # Set seed for random number generator
 set.seed(33)
@@ -49,6 +57,10 @@ multiple_chains
 
 
 # Explore suggested chain ------------------------------------------------
+# step: Inspect the selected chain, paste a screenshot, and describe
+# in the report: number of infectors and their IDs, number of
+# generations, and who infected whom (and when) per generation.
+
 multiple_chains %>%
   # Use data.frame output from <epichains> object
   as_tibble() %>%
@@ -57,6 +69,13 @@ multiple_chains %>%
 
 
 # Visualize --------------------------------------------------------------
+# step: Plot the simulation and build a summary data frame; paste
+# the plot output in the report. Use it to describe:
+# - proportion of chains that go extinct quickly (probability of
+#   extinction)
+# - proportion that crossed the 100-case threshold (explosive
+#   growth from one index case)
+# Write in the report: interpretation and comparison between rooms.
 
 # Daily aggregate of cases
 aggregate_chains <- multiple_chains %>%

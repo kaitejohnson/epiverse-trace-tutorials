@@ -96,7 +96,7 @@ To check if your R version is up to date:
 
 - In RStudio your R version will be printed in [the console window](https://docs.posit.co/ide/user/ide/guide/code/console.html). Or run `sessionInfo()`.
 
-- **To update R**, download and install the latest version from the [R project website](https://cran.rstudio.com/) for your operating system.
+- **To update R**, install the latest version for your operating system from the [R project website](https://cran.rstudio.com/).
 
   - After installing a new version, you will have to reinstall all your packages with the new version. 
 
@@ -114,7 +114,71 @@ While this may sound scary, it is **far more common** to run into issues due to 
 
 :::::::::::::::::::::::::::::
 
-### 2. Install the required R packages
+### 2. Check and Install Build Tools
+
+Some packages require a complementary set of tools to build them.
+Open RStudio and **copy and paste** the following code chunk into the 
+[console window](https://docs.posit.co/ide/user/ide/guide/code/console.html),
+then press the <kbd>Enter</kbd> (Windows and Linux) or <kbd>Return</kbd> (MacOS) to execute the command:
+
+```r
+if(!require("pkgbuild")) install.packages("pkgbuild")
+pkgbuild::check_build_tools(debug = TRUE)
+```
+
+We expect a message like the one below:
+
+```output
+Your system is ready to build packages!
+```
+
+If the build tools are not available, this will trigger an automated install.
+
+1. Run the command in the console.
+2. Don’t interrupt it—wait until R prints the confirmation message.
+3. Once that’s done, restart your R session (or just restart RStudio) to ensure the changes take effect.
+
+If the automatic installation **does not** work, you can manually install them according to your operating system.
+
+::::::::::::::::::::::::::::: tab
+
+### Windows
+
+Windows users will need a working installation of `Rtools` in order to build the package from source.  
+`Rtools` is not an R package, but a software you need to download and install.
+We suggest you to follow:
+
+- **Install `Rtools`**. Download the `Rtools` installer from <https://cran.r-project.org/bin/windows/Rtools/>. Install with default selections.
+- Close and reopen RStudio so it can recognize the new installation.
+
+### Mac
+
+Mac users require two additional steps as detailed in this [guide to Configuring C Toolchain for Mac](https://github.com/stan-dev/rstan/wiki/Configuring-C---Toolchain-for-Mac):
+
+- Install and use [`macrtools`](https://mac.thecoatlessprofessor.com/macrtools/) to setup the C++ toolchain
+- Enable some compiler optimizations.
+
+### Linux
+
+Linux users require specific details per distribution. Find them in this [guide to Configuring C Toolchain for Linux](https://github.com/stan-dev/rstan/wiki/Configuring-C-Toolchain-for-Linux).
+
+:::::::::::::::::::::::::::::
+
+::::::::::::: callout
+
+### Environment Check
+
+This step requires administrator privileges to install software.
+
+If you do not have admin rights in your current environment:  
+
+- Try running the tutorial on your **personal machine** where you have full access.  
+- Use a **preconfigured development environment** (e.g. [Posit Cloud](https://posit.cloud/)).  
+- Ask your **system administrator** to install the required software for you.  
+
+:::::::::::::
+
+### 3. Install the required R packages
 
 <!--
 During the tutorial, we will need a number of R packages. Packages contain useful R code written by other people. We will use packages from the [Epiverse-TRACE](https://epiverse-trace.github.io/). 
@@ -126,7 +190,7 @@ Open RStudio and **copy and paste** the following code chunk into the [console w
 if(!require("pak")) install.packages("pak")
 
 new_packages <- c(
-  # for Introduction tutorial
+  # for Introduction tutorials
   "here",
   "tidyverse",
   "visdat",
@@ -134,6 +198,7 @@ new_packages <- c(
   "rmarkdown",
   "quarto",
   # for Early Task tutorials
+  "readepi",
   "cleanepi",
   "reactable",
   "rio",
@@ -157,6 +222,8 @@ new_packages <- c(
   "socialmixr",
   "finalsize",
   "epiverse-trace/epidemics",
+  "odin",
+  "overshiny",
   "scales"
 )
 
@@ -167,41 +234,13 @@ These installation steps could ask you `? Do you want to continue (Y/n)` write `
 
 ::::::::::::::::::::::::::::: spoiler
 
-### do you get an error with EpiNow2?
-
-Windows users will need a working installation of `Rtools` in order to build the package from source. `Rtools` is not an R package, but a software you need to download and install. We suggest you to follow:
-
-<!-- reference [these steps](http://jtleek.com/modules/01_DataScientistToolbox/02_10_rtools/#1) -->
-
-1. **Verify `Rtools` installation**. You can do so by using Windows search across your system. Optionally, you can use `{devtools}` running: 
-
-```r
-if(!require("devtools")) install.packages("devtools")
-devtools::find_rtools()
-```
-
-If the result is `FALSE`, then you should do step 2.
-
-2. **Install `Rtools`**. Download the `Rtools` installer from <https://cran.r-project.org/bin/windows/Rtools/>. Install with default selections.
-
-3. **Verify `Rtools` installation**. Again, we can use `{devtools}`:
-
-```r
-if(!require("devtools")) install.packages("devtools")
-devtools::find_rtools()
-```
-
-:::::::::::::::::::::::::::::
-
-::::::::::::::::::::::::::::: spoiler
-
 ### do you get an error with epiverse-trace packages?
 
-For example, if you get an error message when installing `{simulist}`, try this alternative code:
+For example, if you get an error message when installing `{epidemics}`, try this alternative code:
 
 ```r
-# for simulist
-install.packages("simulist", repos = c("https://epiverse-trace.r-universe.dev"))
+# for epidemics
+install.packages("epidemics", repos = c("https://epiverse-trace.r-universe.dev"))
 ```
 
 :::::::::::::::::::::::::::::
@@ -220,7 +259,7 @@ install.packages("rio")
 
 ::::::::::::::::::::::::::: spoiler
 
-### What to do if an Error persist?
+### Do you need a GitHub Personal access token (PAT)?
 
 If the error message keyword include an string like `Personal access token (PAT)`, you may need to [set up your GitHub token](https://epiverse-trace.github.io/git-rstudio-basics/02-setup.html#set-up-your-github-token).
 
@@ -273,6 +312,7 @@ library(skimr)
 library(rmarkdown)
 library(quarto)
 # for Early Task tutorials
+library(readepi)
 library(cleanepi)
 library(reactable)
 library(rio)
@@ -296,12 +336,14 @@ library(epichains)
 library(socialmixr)
 library(finalsize)
 library(epidemics)
+library(odin)
+library(overshiny)
 library(scales)
 ```
 
 If you do NOT see an error like `there is no package called ‘...’` you are good to go! If you do, [contact us](#your-questions)!
 
-### 3. Setup an RStudio project and folder
+### 4. Setup an RStudio project and folder
 
 We suggest to use RStudio Projects. 
 
@@ -327,7 +369,7 @@ like `"C:/Users/MyName/WeirdPath/training/data/file.csv"`.
 
 ::::::::::::::::::::::::::::::::: 
 
-### 4. Create a GitHub Account
+### 5. Create a GitHub Account
 
 We can use [GitHub](https://github.com) as a collaboration platform to communicate package issues and engage in [community discussions](https://github.com/orgs/epiverse-trace/discussions).
 
@@ -342,7 +384,7 @@ We can use [GitHub](https://github.com) as a collaboration platform to communica
 
 :::::::::::::::::::::::::::::::::
 
-### 5. Watch and Read the pre-training material
+### 6. Watch and Read the pre-training material
 
 :::::::::::::::::::::::::::: prereq
 

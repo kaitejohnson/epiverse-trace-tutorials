@@ -14,64 +14,7 @@
 This practical is based in the following tutorial episodes:
 
 - <https://epiverse-trace.github.io/tutorials-early/clean-data.html>
-- <https://epiverse-trace.github.io/tutorials-early/validate.html>
-- <https://epiverse-trace.github.io/tutorials-early/describe-cases.html>
-
-Welcome!
-
-- A reminder of our [Code of
-  Conduct](https://github.com/epiverse-trace/.github/blob/main/CODE_OF_CONDUCT.md).
-  If you experience or witness unacceptable behaviour, or have any other
-  concerns, please notify the course organisers or host of the event. To
-  report an issue involving one of the organisers, please use the
-  [LSHTM’s Report and Support
-  tool](https://reportandsupport.lshtm.ac.uk/).
-
-# Read This First
-
-<!-- visible for learners and instructors at practical -->
-
-Instructions:
-
-- Each `Activity` has five sections: the Goal, Questions, Inputs, Your
-  Code, and Your Answers.
-- Solve each Activity in the corresponding `.R` file mentioned in the
-  `Your Code` section.
-- Paste your figure and table outputs and write your answer to the
-  questions in the section `Your Answers`.
-- Choose one group member to share your group’s results with the rest of
-  the participants.
-
-During the practical, instead of simply copying and pasting, we
-encourage learners to increase their fluency writing R by using:
-
-- The double-colon notation, e.g. `package::function()` to specify which
-  package a function comes from, avoid namespace conflicts, and find
-  functions using keywords.
-- Tab key <kbd>↹</kbd> to [autocomplete package or function
-  names](https://support.posit.co/hc/en-us/articles/205273297-Code-Completion-in-the-RStudio-IDE)
-  and [display possible
-  arguments](https://docs.posit.co/ide/user/ide/guide/code/console.html).
-- [Execute one line of
-  code](https://docs.posit.co/ide/user/ide/guide/code/execution.html) or
-  multiple lines connected by the pipe operator (`%>%`) by placing the
-  cursor in the code of interest and pressing the `Ctrl`+`Enter`.
-- [R
-  shortcuts](https://positron.posit.co/keyboard-shortcuts.html#r-shortcuts)
-  to insert the pipe operator (`%>%`) using `Ctrl/Cmd`+`Shift`+`M`, or
-  insert the assignment operator (`<-`) using `Alt/Option`+`-`.
-  <!-- - Get [help yourself with R](https://www.r-project.org/help.html) using the `help()` function or `?` operator to access the function reference manual. -->
-
-If your local configuration was not possible to setup:
-
-- Create one copy of the [Posit Cloud RStudio
-  project](https://posit.cloud/spaces/609790/join?access_code=hPM1tIeKt5ax_Y-P0lMGVUGqzFPNH4wxkKSzXZYb).
-
-## Paste your !Error messages here
-
-
-
-
+- <https://epiverse-trace.github.io/tutorials-early/aggreagate-visualize.html>
 
 # Practical
 
@@ -79,52 +22,86 @@ This practical has two activities.
 
 ## Activity 1: Clean and standardize raw data
 
-Get a clean and standardized data frame using the following available
-inputs:
+**Goal:**
 
-- Raw messy data frame in CSV format
+Produce a clean and standardized data frame from the following input:
 
-As a group, Write your answers to these questions:
+- Raw, messy CSV file
 
-- Diagnose the raw data. What data cleaning operations need to be
-  performed on the dataset? Write all of them before writing the code.
-- What time unit best describes the time span to calculate?
-- Print the report: How would you communicate these results to a
-  decision-maker?
-- Compare: What differences do you identify from other group outputs?
-  (if available)
+**Steps:**
 
-### Inputs
+1.  Open `01-practical-activity-1.R` and complete every line marked with
+    `#<COMPLETE>`, following the instructions in the file.
+2.  Complete the argument in `read_csv()` by pasting the data URL link
+    as a string.
+3.  Complete the arguments of cleaning function. Remove functions based
+    on the data needs.
+4.  Paste screenshots of the data frame before and after cleaning.
+    Answer the questions below.
 
-| Group | Data | Link | Calculate time span | Categorize time span |
-|----|----|----|----|----|
-| 1 | Small linelist | <https://epiverse-trace.github.io/tutorials-early/data/linelist-date_of_birth.csv> | Age as of today | breaks = c(0, 20, 35, 60, 80) |
-| 2 | Large linelist | <https://epiverse-trace.github.io/tutorials-early/data/covid_simulated_data.csv> | Delay from onset of symptoms to the time of death | breaks = c(0, 10, 15, 40) |
-| 3 | Serology data | <https://epiverse-trace.github.io/tutorials-early/data/delta_full-messy.csv> | Time from last exposure to vaccine | breaks = c(0, 30, 100, 600) |
+**Questions:**
 
-## Activity 2: Validate linelist and plot epicurve
+1.  **Diagnose the raw data.** What cleaning operations are needed?
+    Which ones diagnose issues or perform cleaning actions?
+2.  **Time unit.** What time unit best describes the time span you need
+    to calculate?
+3.  **Report.** Print the report. Which features are most useful for you
+    as an analyst to understand or communicate the issues in the data
+    frame?
 
-Get a validated linelist and incidence plot using the following
-available inputs:
-
-- Clean data frame object
-
-As a group, Write your answers to these questions:
-
-- In the validation step, Do you need to allow for extra variable names
-  and types?
-- What is the most apprioriate time unit to aggregate the incidence
-  plot, based on visual inspection?
-- Does using arguments like `fill`, `show_cases`, `angle`, `n_breaks`
-  improve the incidence plot?
-- Interpret: How would you communicate these results to a
-  decision-maker?
-- Compare: What differences do you identify from other group outputs?
-  (if available)
+Discuss your answers with your group before sharing with the wider room.
 
 ### Inputs
 
-Use outputs from activity 1.
+| Room | Data | Link | Calculate time span |
+|----|----|----|----|
+| 1 | Small linelist | <https://epiverse-trace.github.io/tutorials-early/data/linelist-date_of_birth.csv> | Age (as of today) |
+| 2 | Large linelist | <https://epiverse-trace.github.io/tutorials-early/data/covid_simulated_data.csv> | Time from symptom onset to death |
+| 3 | Serology data [^1] | <https://epiverse-trace.github.io/tutorials-early/data/delta_full-messy.csv> | Time from last vaccine dose to sample collection [^2] |
+
+## Activity 2: Plot delays and epicurves
+
+**Goal:**
+
+Using a clean linelist data frame, produce:
+
+- A delay distribution plot showing time between two epidemiological
+  events.
+- An incidence plot (epicurve) showing case counts over time.
+
+**Steps:**
+
+1.  Open `01-practical-activity-2.R` and complete every line marked with
+    `#<COMPLETE>`, following the instructions in the file.
+2.  Describe the pre-configured epidemiological delay.
+3.  Complete the arguments of `incidence2::incidence()` to generate an
+    incidence object.
+4.  Adjust the arguments of `plot()` to get the most informative
+    epicurve. Read the [`plot()` reference
+    manual](https://www.reconverse.org/incidence2/manual.html#sec:man-plot.incidence2)
+    to find available arguments.
+5.  Paste your plots and reply to the questions below.
+
+**Questions:**
+
+- Which combination of time unit and case categories best captures the
+  outbreak pattern and why?
+- What does the shape of your epicurve suggest about how this outbreak
+  spread?
+- Which is larger in your delay distribution: the mean or the median,
+  and what does that tell you about its shape?
+- How might delays in the data collection process affect your
+  interpretation of the most recent cases?
+
+Discuss your answers with your group before sharing with the wider room.
+
+### Inputs
+
+| Room | Disease | Link |
+|----|----|----|
+| 1 | COVID | <https://epiverse-trace.github.io/tutorials-early/data/covid_simulist.rds> |
+| 2 | Ebola | <https://epiverse-trace.github.io/tutorials-early/data/ebola_simulist.rds> |
+| 3 | Unknown | <https://epiverse-trace.github.io/tutorials-early/data/unknown_simulist.rds> |
 
 ### Solution
 
@@ -132,7 +109,9 @@ Use outputs from activity 1.
 
 #### Code
 
-##### Group 1
+##### Room 1
+
+activity 1
 
 ``` r
 # nolint start
@@ -140,9 +119,10 @@ Use outputs from activity 1.
 # Practical 1
 # Activity 1
 
+room_number <- 1
+
 # Load packages ----------------------------------------------------------
 library(cleanepi)
-library(linelist)
 library(incidence2)
 library(tidyverse)
 
@@ -172,61 +152,49 @@ dat_raw
 # How many cleanepi functions did you use to get clean data?
 dat_clean <- dat_raw %>%
   cleanepi::standardize_column_names() %>%
-    cleanepi::standardize_dates(
-      target_columns = c(
-        "date_of_admission",
-        "date_of_birth",
-        "date_first_pcr_positive_test"
-      )
-    ) %>%
-    cleanepi::check_date_sequence(
-      target_columns = c(
-        "date_of_birth",
-        "date_first_pcr_positive_test",
-        "date_of_admission"
-      )
-    ) %>%
-    # using data_dictionary requires valid missing entries
-    cleanepi::replace_missing_values(
-      target_columns = "sex_fem_2",
-      na_strings = "-99"
-    ) %>%
-    cleanepi::clean_using_dictionary(dictionary = dat_dictionary) %>%
-    cleanepi::remove_constants() %>%
-    cleanepi::remove_duplicates(
-      target_columns = c("study_id", "date_of_birth")
+  cleanepi::standardize_dates(
+    target_columns = c(
+      "date_of_admission",
+      "date_of_birth",
+      "date_first_pcr_positive_test"
     )
-
-dat_clean
-
-
-# Create time span variable ----------------------------------------------
-
-# What time span unit best describes the 'delay' from 'onset' to 'death'?
-dat_timespan <- dat_clean %>%
+  ) %>%
+  cleanepi::check_date_sequence(
+    target_columns = c(
+      "date_of_birth",
+      "date_first_pcr_positive_test",
+      "date_of_admission"
+    )
+  ) %>%
+  # using data_dictionary requires valid missing entries
+  cleanepi::replace_missing_values(
+    target_columns = "sex_fem_2",
+    na_strings = "-99"
+  ) %>%
+  cleanepi::clean_using_dictionary(
+    dictionary = dat_dictionary
+  ) %>%
+  cleanepi::remove_constants() %>%
+  cleanepi::remove_duplicates(
+    target_columns = c(
+      "study_id",
+      "date_of_birth"
+    )
+  ) %>% 
   cleanepi::timespan(
     target_column = "date_of_birth",
     end_date = Sys.Date(),
     span_unit = "years",
     span_column_name = "timespan_variable",
     span_remainder_unit = "months"
-  ) %>%
-  # skimr::skim(timespan_variable)
-  # Categorize the delay numerical variable
-  dplyr::mutate(
-    timespan_category = base::cut(
-      x = timespan_variable,
-      breaks = c(0, 20, 35, 60, 80), 
-      include.lowest = TRUE,
-      right = FALSE
-    )
   )
 
-dat_timespan
-
+dat_clean
 
 # nolint end
 ```
+
+activity 2
 
 ``` r
 # nolint start
@@ -234,45 +202,47 @@ dat_timespan
 # Practical 1
 # Activity 2
 
-# Validate linelist ------------------------------------------------------
+room_number <- 1
 
-# Activate error message
-linelist::lost_tags_action(action = "error")
-# linelist::lost_tags_action(action = "warning")
+# Load packages ----------------------------------------------------------
+library(cleanepi)
+library(incidence2)
+library(tidyverse)
 
-# Print tag types, names, and data to guide make_linelist
-linelist::tags_types()
-linelist::tags_names()
-dat_timespan
+# Read raw data ----------------------------------------------------------
+dat_linelist <- readr::read_rds(
+  "https://epiverse-trace.github.io/tutorials-early/data/covid_simulist.rds"
+  )
 
-# Does the age variable pass the validation step?
-dat_validate <- dat_timespan %>% 
-  # Tag variables
-  linelist::make_linelist(
-    id = "study_id",
-    date_reporting = "date_first_pcr_positive_test",
-    gender = "sex_fem_2",
-    # age = "timespan_category", # does not pass validation
-    age = "timespan_variable",
-    occupation = "timespan_category" # Categorical variable
-  ) %>% 
-  # Validate linelist
-  linelist::validate_linelist() %>% 
-  # Test safeguard
-  # dplyr::select(case_id, date_onset, sex)
-  # INSTEAD
-  linelist::tags_df()
+dat_linelist %>% dplyr::glimpse()
 
+# Describe delays --------------------------------------------------------
+
+dat_delays <- dat_linelist %>% 
+  cleanepi::timespan(
+    target_column = "date_onset",
+    end_date = "date_reporting",
+    span_unit = "days",
+    span_column_name = "delay_reporting"
+  )
+
+dat_delays %>% 
+  skimr::skim(delay_reporting)
+
+dat_delays %>% 
+  ggplot(aes(delay_reporting)) +
+  geom_histogram(binwidth = 1) +
+  xlim(0,30)
 
 # Create incidence -------------------------------------------------------
 
 # What is the most appropriate time-aggregate (days, months) to plot?
-dat_incidence <- dat_validate %>%  
+dat_incidence <- dat_linelist %>%
   # Transform from individual-level to time-aggregate
-  incidence2::incidence(
-    date_index = "date_reporting",
-    groups = "occupation", # OR any categorical variable
-    interval = "month",
+  incidence2::incidence_(
+    date_index = c(date_onset, date_outcome),
+    groups = age_category, # the categorical variable
+    interval = "week",
     complete_dates = TRUE
   )
 
@@ -282,8 +252,9 @@ dat_incidence <- dat_validate %>%
 # Do arguments like 'fill', 'show_cases', 'angle', 'n_breaks' improve the plot?
 dat_incidence %>% 
   plot(
-    fill = "occupation", # <KEEP OR DROP>
-    show_cases = TRUE, # <KEEP OR DROP>
+    fill = "age_category", # the categorical variable
+    #nrow = 1, # 1 or 2 <KEEP OR DROP>
+    show_cases = FALSE, # <KEEP OR DROP>
     angle = 45, # <KEEP OR DROP>
     n_breaks = 5 # <KEEP OR DROP>
   )
@@ -293,7 +264,9 @@ dat_incidence %>%
 # nolint end
 ```
 
-##### Group 2
+##### Room 2
+
+activity 1
 
 ``` r
 # nolint start
@@ -301,9 +274,10 @@ dat_incidence %>%
 # Practical 1
 # Activity 1
 
+room_number <- 2
+
 # Load packages ----------------------------------------------------------
 library(cleanepi)
-library(linelist)
 library(incidence2)
 library(tidyverse)
 
@@ -355,49 +329,40 @@ dat_clean <- dat_raw %>%
         "date_outcome"
       )
     ) %>%
-    cleanepi::convert_to_numeric(target_columns = "age") %>%
+    cleanepi::convert_to_numeric(
+      target_columns = "age"
+    ) %>%
     # dplyr::count(sex)
     # using data_dictionary requires valid missing entries
     cleanepi::replace_missing_values(
       target_columns = "sex",
       na_strings = "-99"
     ) %>%
-    cleanepi::clean_using_dictionary(dictionary = dat_dictionary) %>%
+    cleanepi::clean_using_dictionary(
+      dictionary = dat_dictionary
+    ) %>%
     cleanepi::remove_constants() %>%
     cleanepi::remove_duplicates(
-      target_columns = c("case_id", "case_name")
-    )
-
-dat_clean
-
-
-# Create time span variable ----------------------------------------------
-
-# What time span unit best describes the 'delay' from 'onset' to 'death'?
-dat_timespan <- dat_clean %>%
+      target_columns = c(
+        "case_id",
+        "case_name"
+      )
+    ) %>% 
   cleanepi::timespan(
     target_column = "date_onset",
     end_date = "date_outcome",
     span_unit = "days",
     span_column_name = "timespan_variable",
     span_remainder_unit = NULL
-  ) %>%
-  # skimr::skim(timespan_variable)
-  # Categorize the delay numerical variable
-  dplyr::mutate(
-    timespan_category = base::cut(
-      x = timespan_variable,
-      breaks = c(0, 10, 15, 40), 
-      include.lowest = TRUE,
-      right = FALSE
-    )
   )
 
-dat_timespan
+dat_clean
 
 
 # nolint end
 ```
+
+activity 2
 
 ``` r
 # nolint start
@@ -405,45 +370,47 @@ dat_timespan
 # Practical 1
 # Activity 2
 
-# Validate linelist ------------------------------------------------------
+room_number <- 2
 
-# Activate error message
-linelist::lost_tags_action(action = "error")
-# linelist::lost_tags_action(action = "warning")
+# Load packages ----------------------------------------------------------
+library(cleanepi)
+library(incidence2)
+library(tidyverse)
 
-# Print tag types, names, and data to guide make_linelist
-linelist::tags_types()
-linelist::tags_names()
-dat_timespan
+# Read raw data ----------------------------------------------------------
+dat_linelist <- readr::read_rds(
+  "https://epiverse-trace.github.io/tutorials-early/data/ebola_simulist.rds"
+  )
 
-# Does the age variable pass the validation step?
-dat_validate <- dat_timespan %>% 
-  # Tag variables
-  linelist::make_linelist(
-    id = "case_id",
-    date_onset = "date_onset",
-    gender = "sex",
-    age = "age",
-    outcome = "outcome",
-    occupation = "timespan_category" # Categorical variable
-  ) %>% 
-  # Validate linelist
-  linelist::validate_linelist() %>% 
-  # Test safeguard
-  # dplyr::select(case_id, date_onset, sex)
-  # INSTEAD
-  linelist::tags_df()
+dat_linelist %>% dplyr::glimpse()
 
+# Describe delays --------------------------------------------------------
+
+dat_delays <- dat_linelist %>% 
+  cleanepi::timespan(
+    target_column = "date_onset",
+    end_date = "date_reporting",
+    span_unit = "days",
+    span_column_name = "delay_reporting"
+  )
+
+dat_delays %>% 
+  skimr::skim(delay_reporting)
+
+dat_delays %>% 
+  ggplot(aes(delay_reporting)) +
+  geom_histogram(binwidth = 1) +
+  xlim(0,30)
 
 # Create incidence -------------------------------------------------------
 
 # What is the most appropriate time-aggregate (days, months) to plot?
-dat_incidence <- dat_validate %>%  
+dat_incidence <- dat_linelist %>%
   # Transform from individual-level to time-aggregate
-  incidence2::incidence(
-    date_index = "date_onset",
-    groups = "outcome", # OR any categorical variable
-    interval = "day",
+  incidence2::incidence_(
+    date_index = c(date_onset, date_outcome),
+    groups = age_category, # the categorical variable
+    interval = "week",
     complete_dates = TRUE
   )
 
@@ -453,8 +420,11 @@ dat_incidence <- dat_validate %>%
 # Do arguments like 'fill', 'show_cases', 'angle', 'n_breaks' improve the plot?
 dat_incidence %>% 
   plot(
-    angle = 45, # <KEEP OR DROP>
-    n_breaks = 5 # <KEEP OR DROP>
+    # fill = "age_category", # the categorical variable
+    #nrow = 1, # 1 or 2 <KEEP OR DROP>
+    show_cases = FALSE, # <KEEP OR DROP>
+    angle = 90, # <KEEP OR DROP>
+    n_breaks = 3 # <KEEP OR DROP>
   )
 
 # Find plot() arguments at ?incidence2:::plot.incidence2()
@@ -462,11 +432,9 @@ dat_incidence %>%
 # nolint end
 ```
 
-##### Group 3
+##### Room 3
 
-> Group 3 should investigate about how the argument `allow_extra = TRUE`
-> us used in this howto entry
-> <https://epiverse-trace.github.io/howto/analyses/describe_cases/cleanepi-linelist-incidence2-stratified.html>
+activity 1
 
 ``` r
 # nolint start
@@ -474,9 +442,10 @@ dat_incidence %>%
 # Practical 1
 # Activity 1
 
+room_number <- 3
+
 # Load packages ----------------------------------------------------------
 library(cleanepi)
-library(linelist)
 library(incidence2)
 library(tidyverse)
 
@@ -510,42 +479,33 @@ dat_raw
 # How many cleanepi functions did you use to get clean data?
 dat_clean <- dat_raw %>%
   cleanepi::standardize_column_names() %>%
-    cleanepi::standardize_dates(target_columns = "date") %>% #
-    cleanepi::convert_to_numeric(target_columns = "exp_num") %>%
+    cleanepi::standardize_dates(
+      target_columns = "date"
+    ) %>% #
+    cleanepi::convert_to_numeric(
+      target_columns = "exp_num"
+    ) %>%
     cleanepi::check_date_sequence(
-      target_columns = c("last_exp_date", "date")
-    )
-
-dat_clean
-
-
-# Create time span variable ----------------------------------------------
-
-# What time span unit best describes the 'delay' from 'onset' to 'death'?
-dat_timespan <- dat_clean %>%
+      target_columns = c(
+        "last_exp_date",
+        "date"
+      )
+    ) %>% 
   cleanepi::timespan(
     target_column = "last_exp_date",
     end_date = "date",
     span_unit = "days",
     span_column_name = "timespan_variable",
     span_remainder_unit = NULL
-  ) %>%
-  # skimr::skim(timespan_variable)
-  # Categorize the delay numerical variable
-  dplyr::mutate(
-    timespan_category = base::cut(
-      x = timespan_variable,
-      breaks = c(0, 30, 100, 600), 
-      include.lowest = TRUE,
-      right = FALSE
-    )
   )
 
-dat_timespan
+dat_clean
 
 
 # nolint end
 ```
+
+activity 2
 
 ``` r
 # nolint start
@@ -553,50 +513,46 @@ dat_timespan
 # Practical 1
 # Activity 2
 
-# Validate linelist ------------------------------------------------------
+room_number <- 3
 
-# Activate error message
-linelist::lost_tags_action(action = "error")
-# linelist::lost_tags_action(action = "warning")
+# Load packages ----------------------------------------------------------
+library(cleanepi)
+library(incidence2)
+library(tidyverse)
 
-# Print tag types, names, and data to guide make_linelist
-linelist::tags_types()
-linelist::tags_names()
-dat_timespan
+# Read raw data ----------------------------------------------------------
+dat_linelist <- readr::read_rds(
+  "https://epiverse-trace.github.io/tutorials-early/data/unknown_simulist.rds"
+  )
 
-# Does the age variable pass the validation step?
-dat_validate <- dat_timespan %>% 
-  # Tag variables
-  linelist::make_linelist(
-    id = "pid",
-    occupation = "timespan_category", # Categorical variable
-    allow_extra = TRUE,
-    last_exp_date = "last_exp_date",
-    last_vax_type = "last_vax_type"
-  ) %>% 
-  # Validate linelist
-  linelist::validate_linelist(
-    allow_extra = TRUE,
-    ref_types = linelist::tags_types(
-      last_exp_date = c("Date"),
-      last_vax_type = c("character"),
-      allow_extra = TRUE
-    )
-  ) %>% 
-  # Test safeguard
-  # dplyr::select(case_id, date_onset, sex)
-  # INSTEAD
-  linelist::tags_df()
+dat_linelist %>% dplyr::glimpse()
 
+# Describe delays --------------------------------------------------------
+
+dat_delays <- dat_linelist %>% 
+  cleanepi::timespan(
+    target_column = "date_onset",
+    end_date = "date_reporting",
+    span_unit = "days",
+    span_column_name = "delay_reporting"
+  )
+
+dat_delays %>% 
+  skimr::skim(delay_reporting)
+
+dat_delays %>% 
+  ggplot(aes(delay_reporting)) +
+  geom_histogram(binwidth = 1) +
+  xlim(0,30)
 
 # Create incidence -------------------------------------------------------
 
 # What is the most appropriate time-aggregate (days, months) to plot?
-dat_incidence <- dat_validate %>%  
+dat_incidence <- dat_linelist %>%  
   # Transform from individual-level to time-aggregate
-  incidence2::incidence(
-    date_index = "last_exp_date",
-    groups = "last_vax_type", # OR any categorical variable
+  incidence2::incidence_(
+    date_index = date_onset,
+    groups = c(sex, age_category), # the categorical variable
     interval = "month",
     complete_dates = TRUE
   )
@@ -607,7 +563,11 @@ dat_incidence <- dat_validate %>%
 # Do arguments like 'fill', 'show_cases', 'angle', 'n_breaks' improve the plot?
 dat_incidence %>% 
   plot(
-    fill = "last_vax_type"
+    fill = "age_category", # the categorical variable
+    nrow = 1, # 1 or 2 <KEEP OR DROP>
+    show_cases = FALSE, # <KEEP OR DROP>
+    angle = 45, # <KEEP OR DROP>
+    n_breaks = 5 # <KEEP OR DROP>
   )
 
 # Find plot() arguments at ?incidence2:::plot.incidence2()
@@ -617,11 +577,27 @@ dat_incidence %>%
 
 #### Outputs
 
-| Group | Output                                              |
-|-------|-----------------------------------------------------|
-| 1     | ![image](https://hackmd.io/_uploads/ry5d6xnA1e.png) |
-| 2     | ![image](https://hackmd.io/_uploads/SJ2f0e2Cyx.png) |
-| 3     | ![image](https://hackmd.io/_uploads/H1-PRlhA1g.png) |
+##### activity 1
+
+| Room | Cleaning | Time span |
+|----|----|----|
+| 1 | Suggested order: replace missing values before clean using a dictionary for sex variable. Relevant step: remove constants like `Location` and duplicates. | The time unit to calculate age from date of birth to today is “years”. To express today, you can use `Sys.Date()`. It is also the default of `cleanepi::timespan()` |
+| 2 | Relevant step: convert strings to numeric for age, Suggested order: replace inconsistent missing values before clean using a dictionary for sex variable. | The time unit for calculate the delay from date of onset to date of outcome is “days”. |
+| 3 | Relevant step: convert strings to numeric for age. | The time unit to calculate the time from last exposure to vaccine to the date of sample collection is “days”. |
+
+##### activity 2
+
+| Group | Delay | Incidence |
+|----|----|----|
+| 1 | ![image](https://hackmd.io/_uploads/SkIzvCrMMe.png) | ![image](https://hackmd.io/_uploads/rkIuVRBGMe.png) |
+| 2 | ![image](https://hackmd.io/_uploads/rys4wCHGfl.png) | ![image](https://hackmd.io/_uploads/H1F-FAHGfe.png) |
+| 3 | ![image](https://hackmd.io/_uploads/BkoSPCBMfg.png) | ![image](https://hackmd.io/_uploads/SJpIICSGzl.png) |
+
+| Room | Incidence arguments | Plot arguments |
+|----|----|----|
+| 1 | Date by onset and outcome help identify the low proportion of deaths among cases in time. | Keeping `fill` helps visualizing the delay and peak from cases to deaths in the whole population. |
+| 2 | Date by onset and outcome help identify the high proportion of deaths among cases in time. | Dropping `fill` helps identify a higher proportion of deaths in older age groups. |
+| 3 | Interval by month help identify a continuous growth and decay pattern. | Using `fill` with age category helps compare the higher proportion of cases in male compared to female. |
 
 #### Interpretation
 
@@ -633,18 +609,31 @@ Cleaning
   with a data dictionary, we need to remove unconsistent missing values.
   We can use `dplyr::count()` to find this issue.
 
-Validation
-
-- Using the `linelist::tags_df()` output can keep stable downstream
-  analysis. Jointly with `linelist::lost_tags_action(action = "error")`
-  we can improve the capacity to diagnose changes in the input data.
-  This can prevent getting misleading outputs from automatic daily code
-  runs or dashboards updates.
-
 Epicurve
 
-- The argument `show_cases` can improve the visibility of `fill`
-  categorical variables when the amount of observed cases is small.
+- COVID: Onset cases peak sharply around 2023-W03, dominated by the
+  under-20 age group. Outcome dates are sparse and spread later,
+  reflecting the delay between onset and death.
+- Ebola: Across all age groups, symptom onset dates peaks almost as high
+  as outcome dates (2023-W03 to W05). Possibly with a shorter delay from
+  onset to death than the COVID.
+- Unknown: Males had substantially higher case counts than females
+  across all age groups, with both sexes peaking around mid-2023. Older
+  age groups (35-60 and 60-100) make up a larger share in males, while
+  females show a more even age distribution throughout.
+
+Delays
+
+- If the mean exceeds the median, the delay distribution is
+  right-skewed, meaning most samples are collected relatively soon after
+  exposure, but a small number of cases have unusually long delays that
+  pull the average upward.
+- Recent cases are likely undercounted. If there is a lag between an
+  event occurring and it being recorded, the most recent time periods
+  will appear artificially low simply because many cases have not been
+  logged yet. This can make it look like there is a recent decline when
+  it is really just a reporting delay (also known as a right-censoring
+  effect).
 
 # Continue your learning path
 
@@ -654,9 +643,25 @@ Explore the downstream analysis you can do with {incidence2} outputs
 
 - <https://www.reconverse.org/incidence2/doc/incidence2.html#sec:building-on-incidence2>
 
-You can use [{epikinetics}](https://seroanalytics.org/epikinetics/) to
-estimate antibody kinetics. Explore this sample code:
-
-- <https://epiverse-trace.github.io/tutorials-early/epikinetics-statistics.html>
+<!-- You can use [{epikinetics}](https://seroanalytics.org/epikinetics/) to estimate antibody kinetics. Explore this sample code:
+&#10;- <https://epiverse-trace.github.io/tutorials-early/epikinetics-statistics.html> -->
 
 # end
+
+[^1]: **Context of Serological data**: Participants of a study are
+    vaccinated against COVID-19 in multiple doses. Researchers collect
+    serum samples some days after each vaccination dose and expose the
+    serum to emerging SARS-CoV-2 variants. They measure the titre of
+    this immunological response. The higher the titre, the higher the
+    antigenic response. Ref:
+    <https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(24)00484-5/fulltext>
+
+[^2]: **How to read the repeated-measurements cohort dataset**: Subject
+    `pid = 1` was `Infection naive` (never exposed to infection). Was
+    exposed 2 times (`exp_num`) to the vaccine type BNT162b2
+    (`last_vax_type`). The last vaccine exposure was on 2021-03-08
+    (`last_exp_date`). One serum sample was obtained on 2021-03-10
+    (`date`, two days after last vaccine exposure). The antibody titre
+    against `Alpha` and `Delta` SARS-CoV-2 variants (`titre_type`) was 5
+    units (`value`). The antibody titre against `Ancestral` SARS-CoV-2
+    variants was 176 units.

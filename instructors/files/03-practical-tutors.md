@@ -16,97 +16,52 @@ This practical is based in the following tutorial episodes:
 - <https://epiverse-trace.github.io/tutorials-middle/superspreading-estimate.html>
 - <https://epiverse-trace.github.io/tutorials-middle/superspreading-simulate.html>
 
-Welcome!
-
-- A reminder of our [Code of
-  Conduct](https://github.com/epiverse-trace/.github/blob/main/CODE_OF_CONDUCT.md).
-  If you experience or witness unacceptable behaviour, or have any other
-  concerns, please notify the course organisers or host of the event. To
-  report an issue involving one of the organisers, please use the
-  [LSHTM’s Report and Support
-  tool](https://reportandsupport.lshtm.ac.uk/).
-
-# Read This First
-
-<!-- visible for learners and instructors at practical -->
-
-Instructions:
-
-- Each `Activity` has five sections: the Goal, Questions, Inputs, Your
-  Code, and Your Answers.
-- Solve each Activity in the corresponding `.R` file mentioned in the
-  `Your Code` section.
-- Paste your figure and table outputs and write your answer to the
-  questions in the section `Your Answers`.
-- Choose one group member to share your group’s results with the rest of
-  the participants.
-
-During the practical, instead of simply copying and pasting, we
-encourage learners to increase their fluency writing R by using:
-
-- The double-colon notation, e.g. `package::function()` to specify which
-  package a function comes from, avoid namespace conflicts, and find
-  functions using keywords.
-- Tab key <kbd>↹</kbd> to [autocomplete package or function
-  names](https://support.posit.co/hc/en-us/articles/205273297-Code-Completion-in-the-RStudio-IDE)
-  and [display possible
-  arguments](https://docs.posit.co/ide/user/ide/guide/code/console.html).
-- [Execute one line of
-  code](https://docs.posit.co/ide/user/ide/guide/code/execution.html) or
-  multiple lines connected by the pipe operator (`%>%`) by placing the
-  cursor in the code of interest and pressing the `Ctrl`+`Enter`.
-- [R
-  shortcuts](https://positron.posit.co/keyboard-shortcuts.html#r-shortcuts)
-  to insert the pipe operator (`%>%`) using `Ctrl/Cmd`+`Shift`+`M`, or
-  insert the assignment operator (`<-`) using `Alt/Option`+`-`.
-  <!-- - Get [help yourself with R](https://www.r-project.org/help.html) using the `help()` function or `?` operator to access the function reference manual. -->
-
-If your local configuration was not possible to setup:
-
-- Create one copy of the [Posit Cloud RStudio
-  project](https://posit.cloud/spaces/609790/join?access_code=hPM1tIeKt5ax_Y-P0lMGVUGqzFPNH4wxkKSzXZYb).
-
-## Paste your !Error messages here
-
-
-
-
-
 # Practical
 
 This practical has two activities.
 
 ## Activity 1: Account for superspreading
 
-Estimate extent of individual-level variation (i.e. the dispersion
+**Goal:**
+
+Estimate the extent of individual-level variation (i.e. the dispersion
 parameter) of the offspring distribution, which refers to the
-variability in the number of secondary cases per individual, and the
-proportion of transmission that is linked to ‘superspreading events’
-using the following available inputs:
+variability in the number of secondary cases per individual, and assess
+the implications for variation in transmission for decision-making using
+the following available inputs:
 
 - Line list of cases
 - Contact tracing data
 
-As a group, Write your answers to these questions:
+**Steps:**
 
-- From descriptive and estimation steps:
-  - What set has more infections related to fewer clusters in the
-    contact network?
-  - What set has the most skewed histogram of secondary cases?
-  - Does the estimated dispersion parameter correlate with the contact
-    network and histogram of secondary cases?
-- On decision making:
-  - What is the proportion of new cases originating from a cluster of at
-    least 10 cases?
-  - Would you recommend a backward tracing strategy?
-- Interpret: How would you communicate these results to a
-  decision-maker?
-- Compare: What differences do you identify from other group outputs?
-  (if available)
+1.  Open the file `03-practical-activity-1.R` and complete every line
+    marked with `#<COMPLETE>`, following the instructions in the file.
+2.  Paste the URL links as a string to read the linelist and contacts
+    input data for your room.
+3.  Build the directed contact network, calculate out-degree per case,
+    and fit a Negative Binomial distribution to the secondary case
+    counts.
+4.  Paste screenshots of your network, histogram, fitted parameters, and
+    cluster probability, then answer the questions below.
+
+**Questions:**
+
+- Does the estimated dispersion parameter correlate with the contact
+  network and histogram of secondary cases?
+- What is the probability of new cases originating from a cluster of at
+  least 10 cases?
+- Would you recommend a backward contact tracing strategy?
+- Does your dispersion parameter suggest a high or low risk of
+  superspreading? Is this epidemic more likely to explode or be
+  controlled?
+
+Discuss your answers within your group before sharing with the wider
+room.
 
 ### Inputs
 
-| Group | Data |
+| Room | Data |
 |----|----|
 | 1 | <https://epiverse-trace.github.io/tutorials-middle/data/set-01-contacts.rds>, <https://epiverse-trace.github.io/tutorials-middle/data/set-01-linelist.rds> |
 | 2 | <https://epiverse-trace.github.io/tutorials-middle/data/set-02-contacts.rds>, <https://epiverse-trace.github.io/tutorials-middle/data/set-02-linelist.rds> |
@@ -121,13 +76,16 @@ As a group, Write your answers to these questions:
 
 #### Code
 
-##### Set 1 (sample)
+##### Room 1 (sample)
 
 ``` r
 # nolint start
 
 # Practical 3
 # Activity 1
+
+# step: fill in your room number
+room_number <- 1 #valid for all
 
 # Load packages -----------------------------------------------------------
 library(epicontacts)
@@ -136,16 +94,21 @@ library(tidyverse)
 
 
 # Read linelist and contacts ----------------------------------------------
+# step: Paste the URL links as a string to read input data.
+
 dat_contacts <- readr::read_rds(
-  "https://epiverse-trace.github.io/tutorials-middle/data/set-01-contacts.rds"  #<DIFFERENT PER GROUP>
+  "https://epiverse-trace.github.io/tutorials-middle/data/set-01-contacts.rds"  #<DIFFERENT PER ROOM>
 )
 
 dat_linelist <- readr::read_rds(
-  "https://epiverse-trace.github.io/tutorials-middle/data/set-01-linelist.rds"  #<DIFFERENT PER GROUP>
+  "https://epiverse-trace.github.io/tutorials-middle/data/set-01-linelist.rds"  #<DIFFERENT PER ROOM>
 )
 
 
 # Create an epicontacts object -------------------------------------------
+# step: Build a *directed* epicontacts network from the linelist
+# and contacts; paste a screenshot of the network in the report.
+
 epi_contacts <- epicontacts::make_epicontacts(
   linelist = dat_linelist,
   contacts = dat_contacts,
@@ -163,6 +126,9 @@ contact_network
 
 
 # Count secondary cases per subject in contacts and linelist --------------
+# step: Calculate the *out-degree* per case (all linelist cases)
+# and paste the output histogram in the report.
+
 secondary_cases <- epicontacts::get_degree(
   x = epi_contacts,
   type = "out",
@@ -184,6 +150,9 @@ individual_reproduction_num
 
 
 # Fit a negative binomial distribution -----------------------------------
+# step: Fit a Negative Binomial distribution to the secondary case
+# counts using {fitdistrplus}; paste the parameters in the report.
+
 offspring_fit <- secondary_cases %>%
   fitdistrplus::fitdist(distr = "nbinom")
 
@@ -192,11 +161,14 @@ offspring_fit
 
 
 # Estimate proportion of new cases from a cluster of secondary cases ------
+# step: Use {superspreading} with the fitted R and k to estimate
+# the probability new cases come from a cluster of a given size;
+# paste the output in the report.
 
 # Set seed for random number generator
 set.seed(33)
 
-# Estimate the proportion of new cases originating from 
+# Estimate the probability of new cases originating from 
 # a transmission cluster of at least 5, 10, or 25 cases
 proportion_cases_by_cluster_size <- 
   superspreading::proportion_cluster_size(
@@ -213,25 +185,25 @@ proportion_cases_by_cluster_size
 
 #### Outputs
 
-Group 1
+Room 1
 
 | contact network | histogram of secondary cases |
 |----|----|
 | ![Untitled-1](https://hackmd.io/_uploads/H1DVLbsTyx.png) | ![Untitled](https://hackmd.io/_uploads/BkW48Wo6yg.png) |
 
-Group 2
+Room 2
 
 | contact network | histogram of secondary cases |
 |----|----|
 | ![Untitled](https://hackmd.io/_uploads/Hkhg8WspJg.png) | ![Untitled-1](https://hackmd.io/_uploads/HyIlUWopJx.png) |
 
-Group 3
+Room 3
 
 | contact network | histogram of secondary cases |
 |----|----|
 | ![Untitled](https://hackmd.io/_uploads/HkzkUZjpyx.png) | ![Untitled-1](https://hackmd.io/_uploads/SkjCBZjpJe.png) |
 
-Group 1/2/3
+Room 1/2/3
 
 ``` r
 #>     R    k prop_5 prop_10 prop_25
@@ -244,66 +216,77 @@ Group 1/2/3
 
 Interpretation template:
 
-- For R = 0.8 and k = 0.01:
-  - The proportion of new cases originating from a cluster of at least 5
-    secondary cases from a primary case is 95%
+- Two valid alternatives, For R = 0.8 and k = 0.01:
+  - The probability of new cases originating from a cluster of 5 cases
+    or more is 95%.
   - The proportion of all transmission events that were part of
     secondary case clusters (i.e., from the same primary case) of at
-    least 5 cases is 95%
+    least 5 cases is 95%.
 
 Interpretation Helpers:
 
-- From the contact network, set 1 has the highest frequency of
-  infections related with a small proportion of clusters.
-- From the histogram of secondary cases, skewness in set 1 is higher
-  than set 2 and set 3.
-- Set 1 has cases with the highest number of secondary cases (n = 50),
-  compared with set 2 (n = ~25) and set 3 (n = 11).
+- From the contact network, room 1 has the highest frequency of
+  infections related with a small number of clusters (four major
+  clusters out of all the transmission events).
+- From the histogram of secondary cases, skewness in room 1 is higher
+  than room 2 and room 3.
+- Room 1 has cases with the highest number of secondary cases (n = 50),
+  compared with room 2 (n = ~25) and room 3 (n = 11).
 - The contact networks and histograms of secondary cases correlate with
-  the estimated dispersion parameters: A small proportion of clusters
+  the estimated dispersion parameters: A small number of clusters
   generating most of new cases produces a more skewed histogram, and a
   lowest estimate of dispersion parameter.
 - About probability of new cases from transmission cluster of size at
   least 10 cases, and the recommending backward tracing strategy:
-  - set 1: 89%, yes.
-  - set 2: 38%, probably no?
-  - set 3: 3%, no.
+  - room 1: 89%, yes.
+  - room 2: 38%, probably no?
+  - room 3: 3%, no.
 
 ## Activity 2: Simulate transmission chains
 
+**Goal:**
+
 Estimate the potential for large outbreaks that could occur based on
-1000 simulated outbreaks using the following available inputs:
+1000 simulated outbreaks with one initial case, using the following
+available inputs:
 
 - Basic reproduction number
 - Dispersion parameter
 
-As a group, Write your answers to these questions:
+**Steps:**
 
-- You have been assigned to explore `Chain ID`. From the output data
-  frame, describe:
-  - How many generations there are.
-  - Who infected whom, and when (with reference to the day of
-    infection).
-- Among simulated outbreaks:
-  - How many chains reached a 100 case threshold?
-  - What is the maximum size of chain? (The cumulative number of case)
-  - What is the maximum length of chain? (The number of days until the
-    chain stops)
-- Interpret: How would you communicate these results to a
-  decision-maker?
-- Compare: What differences do you identify from other group outputs?
-  (if available)
+1.  Open the file `03-practical-activity-2.R` and complete every line
+    marked with `#<COMPLETE>`, following the instructions in the file.
+2.  Add the input parameters (reproduction number, dispersion, chain ID)
+    for your room.
+3.  Run `epichains::simulate_chains()` with the offspring and generation
+    time parameters, together with `set.seed()`.
+4.  Paste screenshots of your selected chain and the cumulative-cases
+    plot, then answer the questions below.
+
+**Questions:**
+
+- How many generations does this chain have?
+- What is the story of this chain? Who infected whom, and when (with
+  reference to the day of infection)?
+- What proportion of chains appear to go extinct quickly? What could
+  this tell you about the probability of extinction?
+- What proportion crossed a 100-case threshold? What does this suggest
+  about explosive growth from a single case?
+
+Discuss your answers within your group before sharing with the wider
+room.
 
 ### Inputs
 
-| Group | Parameters        | Chain ID |
-|-------|-------------------|----------|
-| 1     | R = 0.8, k = 0.01 | 957      |
-| 2     | R = 0.8, k = 0.1  | 281      |
-| 3     | R = 0.8, k = 0.5  | 38       |
-| 4     | R = 1.5, k = 0.01 | 261      |
-| 5     | R = 1.5, k = 0.1  | 325      |
-| 6     | R = 1.5, k = 0.5  | 591      |
+| Room | Parameters        | Chain ID |
+|------|-------------------|----------|
+| 1    | R = 0.8, k = 0.01 | 957      |
+| 2    | R = 0.8, k = 0.1  | 281      |
+| 3    | R = 0.8, k = 0.5  | 38       |
+| 4    | R = 1.5, k = 0.01 | 261      |
+| 5    | R = 1.5, k = 0.1  | 325      |
+| 6    | R = 1.5, k = 0.5  | 591      |
 
 ### Solution
 
@@ -311,13 +294,16 @@ As a group, Write your answers to these questions:
 
 #### Code
 
-##### Set 1 (sample)
+##### Room 1 (sample)
 
 ``` r
 # nolint start
 
 # Practical 3
 # Activity 2
+
+# step: fill in your room number
+room_number <- 1 #valid for all
 
 # Load packages -----------------------------------------------------------
 library(epiparameter)
@@ -326,12 +312,15 @@ library(tidyverse)
 
 
 # Set input parameters ---------------------------------------------------
-known_basic_reproduction_number <- 0.8
-known_dispersion <- 0.01
-chain_to_observe <- 957
+# step: Paste the corresponding input parameter for this room.
+
+known_basic_reproduction_number <- 0.8 #<DIFFERENT PER GROUP>
+known_dispersion <- 0.01 #<DIFFERENT PER GROUP>
+chain_to_observe <- 957 #<DIFFERENT PER GROUP>
 
 
 # Set iteration parameters -----------------------------------------------
+# step: Learn to create an <epiparameter> class object from scratch.
 
 # Create generation time as an <epiparameter> object
 generation_time <- epiparameter::epiparameter(
@@ -343,7 +332,9 @@ generation_time <- epiparameter::epiparameter(
 
 
 # Simulate multiple chains -----------------------------------------------
-# Run set.seed() and epichains::simulate_chains() together, in the same run
+# step: Simulate 1000 chains from 1 initial case. Add the offspring
+# and generation time parameters, and run set.seed() together with
+# simulate_chains().
 
 # Set seed for random number generator
 set.seed(33)
@@ -365,6 +356,10 @@ multiple_chains
 
 
 # Explore suggested chain ------------------------------------------------
+# step: Inspect the selected chain, paste a screenshot, and describe
+# in the report: number of infectors and their IDs, number of
+# generations, and who infected whom (and when) per generation.
+
 multiple_chains %>%
   # Use data.frame output from <epichains> object
   as_tibble() %>%
@@ -373,6 +368,13 @@ multiple_chains %>%
 
 
 # Visualize --------------------------------------------------------------
+# step: Plot the simulation and build a summary data frame; paste
+# the plot output in the report. Use it to describe:
+# - proportion of chains that go extinct quickly (probability of
+#   extinction)
+# - proportion that crossed the 100-case threshold (explosive
+#   growth from one index case)
+# Write in the report: interpretation and comparison between rooms.
 
 # Daily aggregate of cases
 aggregate_chains <- multiple_chains %>%
@@ -412,19 +414,19 @@ aggregate_chains %>%
 
 #### Outputs
 
-Group 1
+Room 1
 
 | contact network | secondary cases | simulated chains |
 |----|----|----|
 | ![Untitled-1](https://hackmd.io/_uploads/H1DVLbsTyx.png) | ![Untitled](https://hackmd.io/_uploads/BkW48Wo6yg.png) | ![image](https://hackmd.io/_uploads/Sy3x3MNAJe.png) |
 
-Group 2
+Room 2
 
 | contact network | secondary cases | simulated chains |
 |----|----|----|
 | ![Untitled](https://hackmd.io/_uploads/Hkhg8WspJg.png) | ![Untitled-1](https://hackmd.io/_uploads/HyIlUWopJx.png) | ![image](https://hackmd.io/_uploads/rkw-hGN0kl.png) |
 
-Group 3
+Room 3
 
 | contact network | secondary cases | simulated chains |
 |----|----|----|
@@ -435,40 +437,49 @@ Sample
 ``` r
 # infector-infectee data frame 
 simulated_chains_map %>%
-  dplyr::filter(simulation_id == 806) %>%
+  dplyr::filter(chain == 957) %>%
   dplyr::as_tibble()
 ```
 
-    # A tibble: 9 × 6
-      chain infector infectee generation  time simulation_id
-      <int>    <dbl>    <dbl>      <int> <dbl>         <int>
-    1     1       NA        1          1   0             806
-    2     1        1        2          2  16.4           806
-    3     1        1        3          2  11.8           806
-    4     1        1        4          2  10.8           806
-    5     1        1        5          2  11.4           806
-    6     1        1        6          2  10.2           806
-    7     1        2        7          3  26.0           806
-    8     1        2        8          3  29.8           806
-    9     1        2        9          3  26.6           806
+    # A tibble: 16 × 5
+       chain infector infectee generation  time
+       <int>    <dbl>    <dbl>      <int> <dbl>
+     1   957       NA        1          1  0   
+     2   957        1        2          2  3.13
+     3   957        1        3          2  4.12
+     4   957        1        4          2  3.42
+     5   957        1        5          2  3.12
+     6   957        1        6          2  3.50
+     7   957        1        7          2  2.79
+     8   957        1        8          2  3.92
+     9   957        1        9          2  6.56
+    10   957        1       10          2  2.93
+    11   957        1       11          2  4.02
+    12   957        1       12          2  3.17
+    13   957        1       13          2  2.99
+    14   957       10       14          3  6.79
+    15   957       10       15          3  4.43
+    16   957       10       16          3  6.18
 
 #### Interpretation
 
 Interpretation template:
 
-- Simulation `806` have `1` chain with `3` known infectors (`NA`, 1, 2),
-  and `3` generations.
-- In the generation 0, subject `NA` infected subject 1.
-- In the generation 1, subject 1 infected subjects 2, 3, 4, 5, 6. These
-  infections occurred between day 10 and 16 after the “case zero”.
-- In the generation 2, subject 2 infected subjects 7, 8, 9. These
-  infections occurred between day 26 and 29 after the “case zero”.
+- Simulated chain `957` have 1 unknown infector `ID = NA`, 2 known
+  infectors `ID = c(1, 10)`, and 3 generations.
+- In the generation 1, subject `ID = NA` infected subject `ID = 1`.
+- In the generation 2, subject `ID = 1` infected 12 subjects
+  `IDs from 2 to 13`. These infections occurred between day 2 and 6
+  after the first infection (initial case).
+- In the generation 3, subject `ID = 10` infected subjects
+  `ID = c(14, 15, 16)`. These infections occurred between day 4 and 7
+  after the first infection (initial case).
 
 Interpretation Helpers:
 
 From the plot of cumulative cases by day for each simulated chain:
 
-| Group | Parameters | Number of Chains Above 100 | Max Chain Size | Max Chain Length |
+| Room | Parameters | Number of Chains Above 100 | Max Chain Size | Max Chain Length |
 |----|----|----|----|----|
 | 1 | R = 0.8, k = 0.01 | 10 | ~200 | ~20 days |
 | 2 | R = 0.8, k = 0.1 | 8 | ~420 | ~60 days |
@@ -476,6 +487,12 @@ From the plot of cumulative cases by day for each simulated chain:
 | 4 | R = 1.5, k = 0.01 | 16 | ~840 | ~20 days |
 | 5 | R = 1.5, k = 0.1 | 65 | ~890 | ~50 days |
 | 6 | R = 1.5, k = 0.5 | 216 | ~850 | ~90 days |
+
+Individual-level variation in transmission means that although the
+probability of extinction is high, new index cases also have the
+potential for explosive regrowth of the epidemic. This is reflected
+above: most simulated chains die out quickly, while a small number,
+especially at low dispersion (k), cross the 100-case threshold.
 
 # Continue your learning path
 

@@ -3,9 +3,10 @@
 # Practical 1
 # Activity 1
 
+room_number <- 2
+
 # Load packages ----------------------------------------------------------
 library(cleanepi)
-library(linelist)
 library(incidence2)
 library(tidyverse)
 
@@ -48,54 +49,43 @@ dat_clean <- dat_raw %>%
         "date_last_contact"
       )
     ) %>%
+    # first and last contact are outbreak investigation dates
+    # not part of the natural history of disease progression
     cleanepi::check_date_sequence(
       target_columns = c(
-        "date_first_contact",
-        "date_last_contact",
         "date_onset",
         "date_admission",
         "date_outcome"
       )
     ) %>%
-    cleanepi::convert_to_numeric(target_columns = "age") %>%
+    cleanepi::convert_to_numeric(
+      target_columns = "age"
+    ) %>%
     # dplyr::count(sex)
     # using data_dictionary requires valid missing entries
     cleanepi::replace_missing_values(
       target_columns = "sex",
       na_strings = "-99"
     ) %>%
-    cleanepi::clean_using_dictionary(dictionary = dat_dictionary) %>%
+    cleanepi::clean_using_dictionary(
+      dictionary = dat_dictionary
+    ) %>%
     cleanepi::remove_constants() %>%
     cleanepi::remove_duplicates(
-      target_columns = c("case_id", "case_name")
-    )
-
-dat_clean
-
-
-# Create time span variable ----------------------------------------------
-
-# What time span unit best describes the 'delay' from 'onset' to 'death'?
-dat_timespan <- dat_clean %>%
+      target_columns = c(
+        "case_id",
+        "case_name"
+      )
+    ) %>% 
   cleanepi::timespan(
     target_column = "date_onset",
     end_date = "date_outcome",
     span_unit = "days",
     span_column_name = "timespan_variable",
     span_remainder_unit = NULL
-  ) %>%
-  # skimr::skim(timespan_variable)
-  # Categorize the delay numerical variable
-  dplyr::mutate(
-    timespan_category = base::cut(
-      x = timespan_variable,
-      breaks = c(0, 10, 15, 40), 
-      include.lowest = TRUE,
-      right = FALSE
-    )
   )
 
-dat_timespan
+dat_clean
 
 
 # nolint end
