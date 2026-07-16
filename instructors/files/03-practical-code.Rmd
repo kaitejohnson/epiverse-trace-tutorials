@@ -64,3 +64,28 @@ contact_network <- epicontacts::vis_epicontacts(epi_contacts)
 contact_network
 ```
  
+ Count the number of secondary cases per subject in contacts and linelist.
+ First calculate the *out-degree* per case from all linelist cases
+ 
+```{r}
+ secondary_cases <- epicontacts::get_degree(
+  x = epi_contacts,
+  type = "out",
+  only_linelist = TRUE
+)
+```
+
+Plot the histogram of secondary cases
+```{r}
+individual_reproduction_num <- secondary_cases %>%
+  enframe() %>% 
+  ggplot(aes(value)) +
+  geom_histogram(binwidth = 1) +
+  labs(
+    x = "Number of secondary cases",
+    y = "Frequency"
+  )
+
+# Print output
+individual_reproduction_num
+```
