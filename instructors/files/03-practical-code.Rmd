@@ -5,26 +5,62 @@ date: "2026-07-15"
 output: html_document
 ---
 
+Week 3: Estimate superspreading and simulate transmission chains
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(EpiNow2)
+library(epiparameter)
+library(cfr)
+library(outbreaks)
+library(epicontacts)
+library(fitdistrplus)
+library(superspreading)
+library(epichains)
 ```
 
-## R Markdown
+# Activity 1: Account for superspreading
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Goal is to estimate the extent of individual-level variation (i.e. the dispersion parameter) of the offspring distribution -- the number of secondary cases per individual, and assess the implications for decision-making using line list cases and contact tracing data.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Questions: 
+- Does the estimated dispersion parameter correlate with the contact
+  network and histogram of secondary cases?
+- What is the probability of new cases originating from a cluster of at
+  least 10 cases?
+- Would you recommend a backward contact tracing strategy?
+- Does your dispersion parameter suggest a high or low risk of
+  superspreading? Is this epidemic more likely to explode or be
+  controlled?
 
-```{r cars}
-summary(cars)
+Read linelis and contact data
+```{r}
+room_number <- 1
+
+dat_contacts <- readr::read_rds(
+  "https://epiverse-trace.github.io/tutorials-middle/data/set-01-contacts.rds"  #<DIFFERENT PER ROOM>
+)
+
+dat_linelist <- readr::read_rds(
+  "https://epiverse-trace.github.io/tutorials-middle/data/set-01-linelist.rds"  #<DIFFERENT PER ROOM>
+)
+
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+Create an epicontacts object
+This is a directed epicontacts network 
+```{r}
+epi_contacts <- epicontacts::make_epicontacts(
+  linelist = dat_linelist,
+  contacts = dat_contacts,
+  directed = TRUE
+)
+epi_contacts
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Visualise the contact network 
+```{r}
+contact_network <- epicontacts::vis_epicontacts(epi_contacts)
+contact_network
+```
+ 
