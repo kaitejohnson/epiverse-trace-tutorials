@@ -33,7 +33,7 @@ Questions:
   superspreading? Is this epidemic more likely to explode or be
   controlled?
 
-Read linelis and contact data
+Read linelist and contact data
 ```{r}
 room_number <- 1
 
@@ -65,7 +65,20 @@ contact_network
 ```
  
  Count the number of secondary cases per subject in contacts and linelist.
- First calculate the *out-degree* per case from all linelist cases
+ First calculate the *out-degree* per case from all linelist cases.
+ The "out" argument specifies that this is only considering contacts "out" from the case, rather than also "in", towards the case. 
+ 
+In this case, all the contacts in the contact line-list end up eventually being cases, so when we get a vector of the number of contacts per each case, this is also the number of other cases each case infected (generation-agnostic) -- it is the number of "offspring" each case produces.
+This is the input you will need to fit a distribution -- the distribution of number of secondary infections per infector.
+
+*Note distinction to field epi where*:
+- Index case: the first case identified (may or may not be the true first infection)
+- Primary case: the case that introduced infection into the population/setting being studied
+- Secondary case: a case infected by the primary case (i.e., one generation removed)
+- Tertiary case, etc. for further generations
+
+ Here we are using "secondary cases" = "cases caused by a given case" (i.e., that case's offspring), without any implication about which generation the infector itself belongs to. 
+This is a commonly used term in the superspreading literature but should acknowledge it has a slightly different meaning than what it means in field epi. 
  
 ```{r}
  secondary_cases <- epicontacts::get_degree(
@@ -75,10 +88,12 @@ contact_network
 )
 ```
 
-Plot the histogram of secondary cases
+Plot the histogram of secondary cases (number of cases caused by a given case). 
+Another term for this is the individual reproduction number (the number of cases from an infector)
 ```{r}
 individual_reproduction_num <- secondary_cases %>%
-  enframe() %>% 
+  enframe() %>% # This just takes a vector and adds a column for name(the row index) 
+  # and a column for value (the value in the vector)
   ggplot(aes(value)) +
   geom_histogram(binwidth = 1) +
   labs(
@@ -89,3 +104,245 @@ individual_reproduction_num <- secondary_cases %>%
 # Print output
 individual_reproduction_num
 ```
+
+Next we will fit a negative binomial distribution to the number of cases caused by each case
+We'll use the fitdistrplus package to do this. 
+
+Here, the mu parameter indicates the mean number of new cases from each individual case -- this is the R for a pathogen. 
+
+The size or "k" parameter is the dispersion parameter -- the lower the k, the higher the dispersion because the variance scales inversely with k. 
+
+```{r}
+offspring_fit <- secondary_cases %>%
+  fitdistrplus::fitdist(distr = "nbinom")
+
+offpsring_fit
+```
+Compare the fit to the observed data.
+```{r}
+fit_params <- offspring_fit$estimate  # named vector: size, mu
+
+x_vals <- 0:max(secondary_cases)
+
+observed_df <- tibble(value = secondary_cases) %>%
+  count(value) %>%
+  mutate(density = n / sum(n))
+
+fitted_df <- tibble(
+  value = 0:0.1:max(x_vals),
+  density = dnbinom(0:0.1:max(x_vals), size = fit_params["size"], mu = fit_params["mu"])
+)
+
+ggplot() +
+  geom_col(
+    data = observed_df, aes(x = value, y = density),
+    fill = "grey70", width = 0.8
+  ) +
+  geom_line(
+    data = fitted_df, aes(x = value, y = density),
+    color = "firebrick"
+  ) +
+  labs(
+    x = "Number of secondary cases",
+    y = "Proportion",
+    title = "Observed offspring distribution vs fitted negative binomial"
+  ) +
+  theme_minimal()
+```
+
+Next we want to use the negative binomial fit to estimate the probability any new case comes from a cluster of a given size.
+We'll use the `superspreading` package to do this. 
+We'll estimate the probability of new cases originating from a transmission cluster of at least 5, 10, or 25 cases
+
+```{r}
+set.seed(33)
+proportion_cases_by_cluster_size <- 
+  superspreading::proportion_cluster_size(
+    R = offspring_fit$estimate["mu"],
+    k = offspring_fit$estimate["size"],
+    cluster_size = c(5, 10, 25)
+  )
+proportion_cases_by_cluster_size
+```
+
+This means there is a 56% chance of a given case originating from a cluster of more than 25, and a 91% chance of a given case originating from a cluster of 5 cases or more.
+
+  - The probability of new cases originating from a cluster of 5 cases
+    or more is 91%.
+    
+  - The proportion of all transmission events that were part of
+    secondary case clusters (i.e., from the same primary case) of at
+    least 5 cases is 91%.
+
+Interpretation across rooms: 
+- From the contact network, room 1 has the highest frequency of
+  infections related with a small number of clusters (four major
+  clusters out of all the transmission events).
+  
+- From the histogram of secondary cases, skewness in room 1 is higher
+  than room 2 and room 3.
+  
+- Room 1 has cases with the highest number of secondary cases (n = 50),
+  compared with room 2 (n = ~25) and room 3 (n = 11).
+  
+- The contact networks and histograms of secondary cases correlate with
+  the estimated dispersion parameters: A small number of clusters
+  generating most of new cases produces a more skewed histogram, and a
+  lowest estimate of dispersion parameter.
+  
+- About probability of new cases from transmission cluster of size at
+  least 10 cases, and the recommending backward tracing strategy:
+  - room 1: 89%, yes.
+  - room 2: 38%, probably no?
+  - room 3: 3%, no.
+  
+  If there is a high likelihood that a given case came from a large cluster (e.g. 10 cases or more), there is more evidence that backwards contact tracing, to identify the source of the cases' cluster, is likely to be more effective. 
+  
+
+# Activity 2: Simulate transmission chains
+
+Goal of this is to estimate the potential for large outbreaks that could occur based on 1000 simulated outbreaks with one initial case using the basing reproduction number and dispersion parameter (and possible also the generation interval- the time between infector and infectee pairs)
+
+Questions:
+- How many generations does this chain have? This is the "length" parameter
+- What is the story of this chain? Who infected whom, and when (with
+  reference to the day of infection)?
+- What proportion of chains appear to go extinct quickly? What could
+  this tell you about the probability of extinction?
+- What proportion crossed a 100-case threshold? What does this suggest
+  about explosive growth from a single case?
+  
+Start by setting the input parameters (these will differ by room)
+```{r}
+known_basic_reproduction_number <- 0.8 
+known_dispersion <- 0.01 
+chain_to_observe <- 957 
+```
+
+Then set the iteration parameters. 
+This will require creating a generation time `epiparameter` object.
+We will set this as a gamma distribution with a mean of 3 days and a standard deviation of 1 day.
+
+```{r}
+generation_time <- epiparameter::epiparameter(
+  disease = "disease x",
+  epi_name = "generation time",
+  prob_distribution = "gamma",
+  summary_stats = list(mean = 3, sd = 1)
+)
+```
+
+Next we will simulate multiple chains using the `simulate_chains()` function from `epichains`.
+We will simulate 1000 chains from 1 initial case. 
+
+```{r}
+set.seed(33)
+
+multiple_chains <- epichains::simulate_chains(
+  # Simulation controls
+  n_chains = 1000, # Number of chains to simulate
+  statistic = "size",
+  stat_threshold = 500, # Stopping criteria
+  # Offspring
+  offspring_dist = rnbinom,
+  mu = known_basic_reproduction_number,
+  size = known_dispersion,
+  # Generation
+  generation_time = function(x) generate(x = generation_time, times = x)
+)
+
+multiple_chains
+```
+This creates a dataframe which contains "line-list" data on each case- who infected whom and in what chain, generation, and time between infector infectee pairs. 
+
+We will next inspect a specific chain, the "chain to observe".
+
+```{r}
+multiple_chains %>%
+  # Use data.frame output from <epichains> object
+  as_tibble() %>%
+  filter(chain == chain_to_observe) %>%
+  print(n = Inf)
+```
+- Simulated chain `957` have 1 unknown infector `ID = NA`, 2 known
+  infectors `ID = c(1, 10)`, and 3 generations.
+- In the generation 1, subject `ID = NA` infected subject `ID = 1`.
+- In the generation 2, subject `ID = 1` infected 12 subjects
+  `IDs from 2 to 13`. These infections occurred between day 2 and 6
+  after the first infection (initial case).
+- In the generation 3, subject `ID = 10` infected subjects
+  `ID = c(14, 15, 16)`. These infections occurred between day 4 and 7
+  after the first infection (initial case).
+
+
+Next we will visualise the chains. 
+We want to know the proportion of chains that go extinct quickly and the proportion of chaisn that cross the 100-case threshold.
+
+To do this, first we need to aggregate cases by day, by rounding the time to an integer value of days and then counting the number of cases on each day in each chain.
+
+We will also add a variable that counts the cumulative number of cases in each chain. 
+```{r}
+aggregate_chains <- multiple_chains %>%
+  as_tibble() %>%
+  # Count the daily number of cases in each chain
+  mutate(day = ceiling(time)) %>%
+  count(chain, day, name = "cases") %>%
+  # Calculate the cumulative number of cases for each chain
+  group_by(chain) %>%
+  mutate(cumulative_cases = cumsum(cases)) %>%
+  ungroup()
+```
+
+Next let's visualise the transmission chains by their cumulative cases. 
+```{r}
+aggregate_chains %>%
+  # Create grouped chain trajectories
+  ggplot(aes(x = day, y = cumulative_cases, group = chain)) +
+  geom_line(color = "black", alpha = 0.25, show.legend = FALSE) +
+  # Define a 100-case threshold
+  geom_hline(aes(yintercept = 100), lty = 2) +
+  labs(x = "Day", y = "Cumulative cases")
+```
+Next we want to count the number of chains over 100 cases. 
+```{r}
+aggregate_chains %>%
+  filter(cumulative_cases >= 100) %>%
+  count(chain)
+
+aggregate_chains %>%
+  filter(cumulative_cases >=100) %>%
+  distinct(chain) |> nrow()
+```
+Get the distribution of the size of chains. 
+```{r}
+aggregate_chains %>%
+  filter(cumulative_cases >= 100) %>% 
+  skimr::skim(cumulative_cases)
+
+aggregate_chains %>%
+  group_by(chain) |>
+  mutate(total_cases = max(cumulative_cases)) |> 
+  ungroup() |>
+  skimr::skim(total_cases)
+```
+
+Distribution of length of chains
+```{r}
+aggregate_chains %>%
+  filter(cumulative_cases >= 100) %>% 
+  skimr::skim(day)
+
+aggregate_chains %>%
+  group_by(chain) |>
+  mutate(total_days = max(day)) |>
+  ungroup() |>
+  skimr::skim(day)
+```
+
+Interpretation:
+
+Individual-level variation in transmission means that although the
+probability of extinction is high, new index cases also have the
+potential for explosive regrowth of the epidemic. This is reflected
+above: most simulated chains die out quickly, while a small number,
+especially at low dispersion (k), cross the 100-case threshold.
