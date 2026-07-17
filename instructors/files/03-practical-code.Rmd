@@ -116,7 +116,7 @@ The size or "k" parameter is the dispersion parameter -- the lower the k, the hi
 offspring_fit <- secondary_cases %>%
   fitdistrplus::fitdist(distr = "nbinom")
 
-offpsring_fit
+offspring_fit
 ```
 Compare the fit to the observed data.
 ```{r}
@@ -306,19 +306,11 @@ aggregate_chains %>%
 Next we want to count the number of chains over 100 cases. 
 ```{r}
 aggregate_chains %>%
-  filter(cumulative_cases >= 100) %>%
-  count(chain)
-
-aggregate_chains %>%
   filter(cumulative_cases >=100) %>%
   distinct(chain) |> nrow()
 ```
 Get the distribution of the size of chains. 
 ```{r}
-aggregate_chains %>%
-  filter(cumulative_cases >= 100) %>% 
-  skimr::skim(cumulative_cases)
-
 aggregate_chains %>%
   group_by(chain) |>
   mutate(total_cases = max(cumulative_cases)) |> 
@@ -329,14 +321,15 @@ aggregate_chains %>%
 Distribution of length of chains
 ```{r}
 aggregate_chains %>%
-  filter(cumulative_cases >= 100) %>% 
-  skimr::skim(day)
-
-aggregate_chains %>%
   group_by(chain) |>
   mutate(total_days = max(day)) |>
   ungroup() |>
   skimr::skim(day)
+```
+
+Print the size of all simulated chains
+```{r}
+summary(multiple_chains)
 ```
 
 Interpretation:
