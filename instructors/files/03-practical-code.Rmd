@@ -227,9 +227,16 @@ We will set this as a gamma distribution with a mean of 3 days and a standard de
 generation_time <- epiparameter::epiparameter(
   disease = "disease x",
   epi_name = "generation time",
-  prob_distribution = "gamma",
-  summary_stats = list(mean = 3, sd = 1)
+  prob_distribution = 
+    epiparameter::create_prob_distribution(
+      prob_distribution = "gamma",
+      prob_distribution_params = c(shape = 9.000, scale = 0.333)
+    )
+  #prob_distribution = "gamma",
+  #summary_stats = list(mean = 3, sd = 1)
 )
+generation_time
+plot(generation_time)
 ```
 
 Next we will simulate multiple chains using the `simulate_chains()` function from `epichains`.
@@ -286,11 +293,18 @@ aggregate_chains <- multiple_chains %>%
   as_tibble() %>%
   # Count the daily number of cases in each chain
   mutate(day = ceiling(time)) %>%
-  count(chain, day, name = "cases") %>%
+  count(chain, day, name = "incident_cases") %>%
   # Calculate the cumulative number of cases for each chain
   group_by(chain) %>%
-  mutate(cumulative_cases = cumsum(cases)) %>%
+  mutate(cumulative_cases = cumsum(incident_cases)) %>%
   ungroup()
+```
+
+Print a couple of chains to better understand the output.
+```{r}
+aggregate_chains %>% 
+  arrange(chain) %>% 
+  print(n=50)
 ```
 
 Next let's visualise the transmission chains by their cumulative cases. 
@@ -303,6 +317,25 @@ aggregate_chains %>%
   geom_hline(aes(yintercept = 100), lty = 2) +
   labs(x = "Day", y = "Cumulative cases")
 ```
+Let's next summarise the chain by its duration and size
+```{r}
+summary_chains <-
+  aggregate_chains %>%
+  dplyr::group_by(chain) %>%
+  dplyr::summarise(
+    max_day = max(day), # chain duration
+    total_cases = max(cumulative_cases) # chain size
+  ) %>%
+  dplyr::ungroup()
+```
+
+Print the duration and size for chains above 100 cases
+```{r}
+summary_chains %>% 
+  dplyr::filter(total_cases > 100)
+
+```
+
 Next we want to count the number of chains over 100 cases. 
 ```{r}
 aggregate_chains %>%
@@ -311,28 +344,30 @@ aggregate_chains %>%
 ```
 Get the distribution of the size of chains. 
 ```{r}
-aggregate_chains %>%
-  group_by(chain) |>
-  mutate(total_cases = max(cumulative_cases)) |> 
-  ungroup() |>
-  skimr::skim(total_cases)
+hist(summary_chains$total_cases)
+summary_chains$total_cases
 ```
 
 Distribution of length of chains
 ```{r}
-aggregate_chains %>%
-  group_by(chain) |>
-  mutate(total_days = max(day)) |>
-  ungroup() |>
-  skimr::skim(day)
+hist(summary_chains$max_day)
+summary_chains$max_day
+```
+```{r}
+# infector-infectee data frame 
+multiple_chains %>%
+  dplyr::filter(chain == 957) %>%
+  dplyr::as_tibble()
 ```
 
-Print the size of all simulated chains
-```{r}
-summary(multiple_chains)
-```
 
 Interpretation:
+
+- Simulated chain 957 have 1 unknown infector ID = NA, 2 known infectors ID = c(1, 10), and 3 generations.
+- In the generation 1, subject ID = NA infected subject ID = 1.
+- In the generation 2, subject ID = 1 infected 12 subjects IDs from 2 to 13. These infections occurred between day 2 and 6 after the first infection (initial case).
+- In the generation 3, subject ID = 10 infected subjects ID = c(14, 15, 16). These infections occurred between day 4 and 7 after the first infection (initial case).
+
 
 Individual-level variation in transmission means that although the
 probability of extinction is high, new index cases also have the
